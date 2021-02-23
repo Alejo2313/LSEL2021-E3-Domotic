@@ -68,13 +68,24 @@
 
 typedef enum 
 {
-    WIFI_CONNECTED    = BIT_SHIFT(0),
-    MQTT_CONNECTED    = BIT_SHIFT(1),
-    MQTT_SUBSCRIBED   = BIT_SHIFT(2),
-    MQTT_UNSUBSCRIBED = BIT_SHIFT(3),
-    MQTT_ERROR        = BIT_SHIFT(4),
-    MQTT_PUBLISHED    = BIT_SHIFT(5),
-    MQTT_NEWDATA      = BIT_SHIFT(6)
+    WIFI_CONNECTED      = BIT_SHIFT(0),
+    MQTT_CONNECTED      = BIT_SHIFT(1),
+    MQTT_SUBSCRIBED     = BIT_SHIFT(2),
+    MQTT_UNSUBSCRIBED   = BIT_SHIFT(3),
+    MQTT_ERROR          = BIT_SHIFT(4),
+    MQTT_PUBLISHED      = BIT_SHIFT(5),
+    MQTT_NEWDATA        = BIT_SHIFT(6),
+
+    LED_ON              = BIT_SHIFT(7),
+    LED_OFF             = BIT_SHIFT(8),
+    LED_COLOR           = BIT_SHIFT(9),
+    ALARM_OFF           = BIT_SHIFT(10),
+    ALARM_ON            = BIT_SHIFT(11),
+
+    START               = BIT_SHIFT(12),
+    CONFIGURE           = BIT_SHIFT(13),
+
+
 }flags_t;
 
 
