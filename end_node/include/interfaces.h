@@ -1,89 +1,198 @@
+/**                             _____________
+ *              /\      /\     /             \
+ *             //\\____//\\   |   MAUUUU!!    |
+ *            /     '      \   \  ___________/
+ *           /   /\ '  /\    \ /_/			      / /  ___    / __\ |__   __ _| |_ 
+ *          |    == o ==     |        /|	     / /  / _ \  / /  | '_ \ / _` | __|
+ *           \      '        /       | |	    / /__|  __/ / /___| | | | (_| | |_ 
+ *             \           /         \ \	    \____/\___| \____/|_| |_|\__,_|\__|
+ *             /----<o>----\         / /
+ *             |            ' \       \ \
+ *             |    |    | '   '\      \ \
+ *  _________  | ´´ |  ' |     '  \    / /
+ *  |  MAYA  | |  ' |    | '       |__/ /
+ *   \______/   \__/ \__/ \_______/____/
+ * 
+ * @file mqtt_ext.c
+ * @author Alejandro Gómez (Alejo2313)
+ * @author Jaime ....
+ * @brief System interfaces (HEADER)
+ * @version 0.1
+ * @date 28/02/2021
+ * 
+ * @copyright Copyright (c) 2021
+ * 
+ */
+
 #ifndef __INTERFACES_H__
 #define __INTERFACES_H__
 
 #include "defines.h"
 
+/****************************  LED structutures ****************************/
+
+/**
+ * @brief LED function table
+ * 
+ */
 typedef struct 
 {
-    void (*gpioSet)(void);
-    void (*gpioReset)(void);
+    void (*setGPIO)(uint32_t GPIO);                     //<! Set GPIO to HIGH
+    void (*resetGPIO)(uint32_t GPIO);                   //<! Set GPIO to  LOW
+    void (*pwmSet)(uint32_t GPIO, uint8_t dutyCycle);   //<! Set PWM duty Cycle 
 
-    void (*pwmSet)(uint32_t GPIO, uint8_t dutyCycle);
+}led_interface_t;
 
-}LED_interface_t;
-
+/**
+ * @brief LED Data
+ * 
+ */
 typedef struct 
 {
     
-    uint32_t* flags;
-//    void* mutex; ??
-    uint32_t rPin, gPin, bPin;
-    uint8_t rColor, gColor, bColor;
-    uint32_t alarmPin;
+    uint32_t* flags;                        //<! pointer to system flags
 
-}LED_data_t;
+    uint32_t rPin, gPin, bPin, alarmPin;    //<! GPIO numbers
+    uint8_t rColor, gColor, bColor;         //<! LED colours               
 
+}led_data_t;
 
+/**
+ * @brief LED fsm Struct 
+ * 
+ */
+typedef struct 
+{
+    fsm_t fsm;
+    led_data_t data;
+    led_interface_t interface;
+
+}fsm_led_t;
+
+/****************************  control structutures ****************************/
+
+/**
+ * @brief control function table
+ * 
+ */
 typedef struct 
 {
 
-    int  (*readGPIO)(uint32_t btnPin);
-    void (*wifiConnect)();
-    void (*mqttConnect)();
+    int  (*readGPIO)(uint32_t btnPin);      //<! Read GPIO state
+    void (*wifiConnect)();                  //<! Connect to WiFi
+    void (*mqttConnect)();                  //<! Connect to MQTT
 
-    void (*enterConfigMode)();
-    uint64_t (*getTickCount)();
+    void (*enterConfigMode)();              //<! Enter in Staton Mode
+    uint64_t (*getTickCount)();             //<! Get tickcount value
 
-}CONTROL_interface_t;
+}control_interface_t;
 
+/**
+ * @brief control Data
+ * 
+ */
 typedef struct 
 {
 
-    uint32_t* flags;
-    uint32_t btnPin;
+    uint32_t* flags;    //<! Pointer to flags
 
-}CONTROL_data_t;
+    uint32_t btnPin;    //<! Button GPIO
 
+}control_data_t;
 
+/**
+ * @brief Control fsm structure 
+ * 
+ */
+typedef struct 
+{
+    fsm_t fsm;
+    control_data_t data;
+    control_interface_t interface;
+    
+}fsm_control_t;
+
+/****************************  sensor structutures ****************************/
+
+/**
+ * @brief Sensor function table
+ * 
+ */
 typedef struct 
 {
 
-    int (*readTemp)();
-    int (*readHum)();
-    int (*readLight)();
+    int (*readTemp)();              //<! Get current temperature
+    int (*readHum)();               //<! Get current humidity
+    int (*readLight)();             //<! Get current light
 
-    uint64_t (*getTickCount)();
+    uint64_t (*getTickCount)();     //<! Get tickcount value
 
-}SENSOR_interface_t;
+}sensor_interface_t;
 
+/**
+ * @brief Sensor data structure
+ * 
+ */
 typedef struct 
 {
 
-    uint32_t* flags;
-    int temp, hum, light;
+    uint32_t* flags;                //<! Pointer to flags
 
-}SENSOR_data_t;
+    int temp, hum, light;           //<! Sensor values
+    uint64_t tickCounter;           //<! System Tick counter
 
+}sensor_data_t;
 
+/**
+ * @brief fsm Sensor structure 
+ * 
+ */
+typedef struct 
+{
+    fsm_t fsm;
+    sensor_data_t data;
+    sensor_interface_t interface;
+    
+}fsm_sensor_t;
 
+/****************************  Event structutures ****************************/
+
+/**
+ * @brief Event function table 
+ * 
+ */
 typedef struct 
 {
 
-    int (*getData)( char** data, uint16_t* size );
-    void (*sendData)(int topicId, const char* data, uint16_t len );
+    int (*getData)( char** data, uint16_t* size );                          //<! Get input data
+    void (*sendData)(int topicId, const char* data, uint16_t len );         //<! Send data
 
-}Event_interface_t;
+}event_interface_t;
 
+/**
+ * @brief Event data 
+ * 
+ */
 typedef struct 
 {
-    uint32_t* flags;
+    uint32_t* flags;                //<!  Pointer to flags
 
-    uint32_t* uint8_t colorLED;
-    SENSOR_data_t* sensorData;
-    LED_data_t* colorLEDData;
+    sensor_data_t* sensorData;      //<! Sensor data pointer 
+    led_data_t* colorLEDData;       //<! Led data pointer 
 
-}Event_data_t;
+}event_data_t;
 
+/**
+ * @brief Event FSM structure
+ * 
+ */
+typedef struct 
+{
+    fsm_t fsm;
+    event_data_t data;
+    event_interface_t interface;
+
+};
 
 
 #endif

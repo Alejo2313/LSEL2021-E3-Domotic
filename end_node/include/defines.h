@@ -82,8 +82,10 @@ typedef enum
     ALARM_OFF           = BIT_SHIFT(10),
     ALARM_ON            = BIT_SHIFT(11),
 
-    START               = BIT_SHIFT(12),
-    CONFIGURE           = BIT_SHIFT(13),
+    SEND_DATA           = BIT_SHIFT(12),
+
+    START               = BIT_SHIFT(13),
+    CONFIGURE           = BIT_SHIFT(14),
 
 
 }flags_t;

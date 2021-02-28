@@ -1,190 +1,252 @@
-#include "fsm.h"
-#include "interfaces.h"
-#include "defines.h"
+/**                             _____________
+ *              /\      /\     /             \
+ *             //\\____//\\   |   MAUUUU!!    |
+ *            /     '      \   \  ___________/
+ *           /   /\ '  /\    \ /_/			      / /  ___    / __\ |__   __ _| |_ 
+ *          |    == o ==     |        /|	     / /  / _ \  / /  | '_ \ / _` | __|
+ *           \      '        /       | |	    / /__|  __/ / /___| | | | (_| | |_ 
+ *             \           /         \ \	    \____/\___| \____/|_| |_|\__,_|\__|
+ *             /----<o>----\         / /
+ *             |            ' \       \ \
+ *             |    |    | '   '\      \ \
+ *  _________  | ´´ |  ' |     '  \    / /
+ *  |  MAYA  | |  ' |    | '       |__/ /
+ *   \______/   \__/ \__/ \_______/____/
+ * 
+ * @file defines.h
+ * @author Alejandro Gómez (Alejo2313)
+ * @author Jaime...
+ * @brief FSM functions (SOURCE)
+ * @version 0.1
+ * @date 28/02/2021
+ * 
+ * @copyright Copyright (c) 2021
+ * 
+ */
 
-//structs and variables
+/******************************** Includes *********************************/
 
-LED_interface_t led_interface;
-flags_t flags;
-LED_data_t led_data;
-SENSOR_data_t sensor_data;
-SENSOR_interface_t sensor_interface;
-Event_data_t event_data;
-Event_interface_t event_interface;
+#include "fsm_functions.h"
+
+/******************************** Defines **********************************/
+
+/******************************** Types   **********************************/
+
+/******************************** Variables ********************************/
+
+/******************************** Prototypes *******************************/
+
+/******************************** Functions ********************************/
 
 
-//LED FSM FUNCTIONS
+int checkStart( fsm_t* this )
+{
 
-enum led_state {
-  IDLE,
-  WAITING,
-  LED_ON
-};
+  fsm_led_t* fsm = (fsm_led_t*)this;
+	return IS_FLAG(fsm->data.flags, START);
 
-//funciones de guarda
-
-int compruebaStart(fsm_t* this) {
-	return flags.START;
 }
 
-int compruebaOnLed(fsm_t* this) {
-	return flags.LED_ON;
+int checkOnLed( fsm_t* this )
+{
+
+  fsm_led_t* fsm = (fsm_led_t*)this;
+	return IS_FLAG(fsm->data.flags, LED_ON);
+
 }
 
-int compruebaOffLed(fsm_t* this) {
-	return flags.LED_OFF;
+int checkOffLed( fsm_t* this )
+{
+
+  fsm_led_t* fsm = (fsm_led_t*)this;
+	return IS_FLAG(fsm->data.flags, LED_OFF);
+
 }
 
-int compruebaVariacionColor(fsm_t* this) {
-	return flags.LED_COLOR;
+int checkColorChange( fsm_t* this )
+{
+
+  fsm_led_t* fsm = (fsm_led_t*)this;
+	return IS_FLAG(fsm->data.flags, LED_COLOR);
+
 }
 
-int compruebaResetSystem(fsm_t* this) {
-	return flags.CONFIGURE;
+int checkSystemReset( fsm_t* this )
+{
+  fsm_led_t* fsm = (fsm_led_t*)this;
+	return !IS_FLAG(fsm->data.flags, START);
 }
 
 //funciones de activación
 
-void encenderLed (fsm_t* this) {
-	led_interface.gpioSet();
+void turnOnLed ( fsm_t* this )
+{
+
+  fsm_led_t* fsm = (fsm_led_t*)this;
+
+  CLEAR_FLAGS(fsm->data.flags, LED_ON);
+
+  fsm->interface.pwmSet(fsm->data.rPin, DEFAULT_DUTY);
+  fsm->interface.pwmSet(fsm->data.gPin, DEFAULT_DUTY);
+  fsm->interface.pwmSet(fsm->data.bPin, DEFAULT_DUTY);
+  
 }
 
-void regularIntensidadLed (fsm_t* this) {
-	led_interface.pwmSet(led_data.rPin, led_data.rColor);
-   	led_interface.pwmSet(led_data.bPin, led_data.bColor);
-	led_interface.pwmSet(led_data.gPin, led_data.gColor);
+void changeColor ( fsm_t* this ) 
+{
+
+  fsm_led_t* fsm = (fsm_led_t*)this;
+
+  CLEAR_FLAGS(fsm->data.flags, LED_COLOR);
+
+  fsm->interface.pwmSet(fsm->data.rPin, fsm->data.rColor);
+  fsm->interface.pwmSet(fsm->data.rPin, fsm->data.gColor);
+  fsm->interface.pwmSet(fsm->data.rPin, fsm->data.bColor);
+
 }
 
-void apagarLed (fsm_t* this) {
-	led_interface.gpioReset();
+void turnOffLed ( fsm_t* this ) 
+{
+
+  fsm_led_t* fsm = (fsm_led_t*)this;
+
+  CLEAR_FLAGS(fsm->data.flags, LED_OFF);
+
+  fsm->interface.pwmSet(fsm->data.rPin, 0);
+  fsm->interface.pwmSet(fsm->data.gPin, 0);
+  fsm->interface.pwmSet(fsm->data.bPin, 0);
 }
-
-
-//tabla de transiciones
-
-static fsm_trans_t led_fsm[] = {
-  { IDLE,       compruebaStart,                 WAITING,    NULL                },
-  { WAITING,    compruebaOnLed,                 LED_ON,     encenderLed         },
-  { LED_ON,     compruebaVariacionIntensidad,   LED_ON,     regularIntensidadLed},
-  { LED_ON,     compruebaOffLed,                WAITING,    apagarLed           },
-  { LED_ON,     compruebaResetSystem,           IDLE,       NULL                },
-  { WAITING,    compruebaResetSystem,           IDLE,       NULL                },
-  {-1, NULL, -1, NULL },
-};
 
 
 //GENERIC SENSOR FSM
 
-enum sensor_state {
-  IDLE,
-  WAIT,
-  READ
-};
+
 
 
 //funciones de guarda
 
-int compruebaTimerSensor(fsm_t* this) {
+int checkTimerSensor( fsm_t* this ) 
+{
 	//devuelve el valor del flag que nos informa de que el timer se ha cumplido
+
+  fsm_sensor_t* fsm = (fsm_sensor_t*)this;
+
+  if( fsm->interface.getTickCount() - fsm->data.tickCounter > SENSOR_TICK_RATE )
+  {
+
+    fsm->data.tickCounter = fsm->interface.getTickCount();
+    return 1;
+
+  }
+
+  return 0;
+
 }
 
-int compruebaDataAvailable(fsm_t* this) {
-	//devuelve el valor del flag que nos informa de que los datos están listos para enviarse
+inline int isTrue( fsm_t* this ) 
+{
+  return 1;
 }
-
 
 //funciones de activación
 
 
-void startTimerSensor (fsm_t* this) {
-	//Comienza la cuenta del timer del sensor
+void startTimerSensor ( fsm_t* this ) 
+{
+
+  fsm_sensor_t* fsm = (fsm_sensor_t*)this;
+
+  fsm->data.tickCounter = fsm->interface.getTickCount();
+
 }
 
 
-void readData (fsm_t* this) {
-	sensor_data.hum = sensor_interface.readHum();
-    sensor_data.light = sensor_interface.readLight();
-    sensor_data.temp = sensor_interface.readTemp();
+void readData ( fsm_t* this ) 
+{
+
+  fsm_sensor_t* fsm = (fsm_sensor_t*)this;
+
+  fsm->data.light = fsm->interface.readLight();
+  fsm->data.hum   = fsm->interface.readHum();
+  fsm->data.temp  = fsm->interface.readTemp();
+
 }
 
+//Queue¿?
 
-void sendData (fsm_t* this) {
-    //levantamos flag indicando que se pueden mandar nuevos datos, empezamos el timer de nuevo
+void sendData ( fsm_t* this ) 
+{
+  fsm_sensor_t* fsm = (fsm_sensor_t*)this;
+
+  SET_FLAGS(fsm->data.flags, SEND_DATA);
+
+  fsm->data.tickCounter = fsm->interface.getTickCount();
+
 }
 
 //tabla de transiciones
 
-static fsm_trans_t sensor_fsm[] = {
-  { IDLE,   compruebaStart,           WAIT,     startTimerSensor    },
-  { WAIT,   compruebaTimerSensor,     READ,     readData            },
-  { READ,   compruebaDataAvailable,   WAIT,     sendData            },
-  { WAIT,   compruebaResetSystem,     IDLE,     NULL                },
-  { READ,   compruebaResetSystem,     IDLE,     NULL                },
-  {-1, NULL, -1, NULL },
-};
+
 
 
 //EVENTOS FSM
 
-enum sensor_state {
-  IDLE,
-  COMM
-};
 
 
+/*** REVISAR
 //funciones de guarda
 
-int compruebaFlagSensor(fsm_t* this) {
-	//comprueba si hay nueva información de los sensores para enviar
+int checkFlagSensor( fsm_t* this ) {
+	//check si hay nueva información de los sensores para enviar
 }
 
-int compruebaFlagEnciendeLed(fsm_t* this, flags_t flags) {
+int checkFlagEnciendeLed(fsm_t* this, flags_t flags) {
     return flags.LED_ON;
 }
 
-int compruebaFlagApagaLed(fsm_t* this, flags_t flags) {
+int checkFlagApagaLed(fsm_t* this, flags_t flags) {
     return flags.LED_OFF;
 }
 
-int compruebaFlagColorLed(fsm_t* this, flags_t flags) {
+int checkFlagColorLed(fsm_t* this, flags_t flags) {
     return flags.LED_COLOR;
 }
 
-int compruebaFlagAlarmaOn(fsm_t* this, flags_t flags) {
+int checkFlagAlarmaOn(fsm_t* this, flags_t flags) {
     return flags.ALARM_ON;
 }
 
-int compruebaFlagAlarmaOff(fsm_t* this, flags_t flags) {
+int checkFlagAlarmaOff(fsm_t* this, flags_t flags) {
     return flags.ALARM_OFF;
 }
 
 //funciones de activación
 
 
-void sendDataSensores (fsm_t* this) {
+void sendDataSensores ( fsm_t* this ) {
     //Enviamos los datos recogidos por los sensores
 }
 
 
-void onLed (fsm_t* this) {
+void onLed ( fsm_t* this ) {
 	//Damos la orden de encender los leds
 }
 
 
-void offLed (fsm_t* this) {
+void offLed ( fsm_t* this ) {
     //Damos la orden de apagar los leds
 }
 
-void colorLed (fsm_t* this) {
+void colorLed ( fsm_t* this ) {
     //Damos la orden de cambiar el color de los leds
 }
 
 
-void alarmaOn (fsm_t* this) {
+void alarmaOn ( fsm_t* this ) {
     //Damos la orden de encender la alarma
 }
 
-void alarmaOff (fsm_t* this) {
+void alarmaOff ( fsm_t* this ) {
     //Damos la orden de apagar la alarma
 }
 
@@ -192,15 +254,15 @@ void alarmaOff (fsm_t* this) {
 //tabla de transiciones
 
 static fsm_trans_t eventos_fsm[] = {
-  { IDLE,   compruebaStart,             COMM,     NULL              },
-  { COMM,   compruebaFlagSensor,        COMM,     sendDataSensores  },
-  { COMM,   compruebaFlagEnciendeLed,   COMM,     onLed             },
-  { COMM,   compruebaFlagApagaLed,      COMM,     offLed            },
-  { COMM,   compruebaFlagColorLed,      COMM,     colorLed          },
-  { COMM,   compruebaFlagAlarmaOn,      COMM,     alarmaOn          },
-  { COMM,   compruebaFlagAlarmaOff,     COMM,     alarmaOff         },
-  { COMM,   compruebaResetSystem,       IDLE,     NULL              },
+  { IDLE,   checkStart,             COMM,     NULL              },
+  { COMM,   checkFlagSensor,        COMM,     sendDataSensores  },
+  { COMM,   checkFlagEnciendeLed,   COMM,     onLed             },
+  { COMM,   checkFlagApagaLed,      COMM,     offLed            },
+  { COMM,   checkFlagColorLed,      COMM,     colorLed          },
+  { COMM,   checkFlagAlarmaOn,      COMM,     alarmaOn          },
+  { COMM,   checkFlagAlarmaOff,     COMM,     alarmaOff         },
+  { COMM,   checkSystemReset,       IDLE,     NULL              },
   {-1, NULL, -1, NULL },
 };
 
-
+*/
