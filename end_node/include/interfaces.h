@@ -179,6 +179,7 @@ typedef struct
 
     sensor_data_t* sensorData;      //<! Sensor data pointer 
     led_data_t* colorLEDData;       //<! Led data pointer 
+    int topic_index[NTOPICS];
 
 }event_data_t;
 
@@ -192,7 +193,7 @@ typedef struct
     event_data_t data;
     event_interface_t interface;
 
-};
+}fsm_event_t;
 
 
 #endif

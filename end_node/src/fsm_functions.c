@@ -184,85 +184,101 @@ void sendData ( fsm_t* this )
 
 }
 
-//tabla de transiciones
-
-
-
 
 //EVENTOS FSM
 
-
-
-/*** REVISAR
-//funciones de guarda
-
-int checkFlagSensor( fsm_t* this ) {
-	//check si hay nueva información de los sensores para enviar
+int checkFlagOutData( fsm_t* this ) 
+{
+  fsm_event_t* fsm = (fsm_event_t*)this;
+  return IS_FLAG(fsm->data.flags, SEND_DATA);
 }
 
-int checkFlagEnciendeLed(fsm_t* this, flags_t flags) {
-    return flags.LED_ON;
+int checkFlagInData( fsm_t* this ) 
+{
+  fsm_event_t* fsm = (fsm_event_t*)this;
+  return IS_FLAG(fsm->data.flags, MQTT_NEWDATA);
 }
 
-int checkFlagApagaLed(fsm_t* this, flags_t flags) {
-    return flags.LED_OFF;
+/**
+ * @brief 
+ * 
+ * @param this 
+ */
+
+void processData(fsm_t* this)
+{
+  char* data;
+  uint16_t size;
+  int index;
+  int* topic;
+  int tmp;
+  led_data_t* aux;
+
+  fsm_event_t* fsm = (fsm_event_t*)this;
+  topic = fsm->data.topic_index;
+  aux = fsm->data.colorLEDData;
+
+  CLEAR_FLAGS(fsm->data.flags, MQTT_NEWDATA);
+
+  index = getIncomeData(&data, &size);
+  switch (index)
+  {
+  case topic[TURN_LED]:
+    tmp = atoi(data);
+    if (tmp > 0)
+    {
+      SET_FLAGS(fsm->data.flags, LED_ON);
+    } else
+    {
+      SET_FLAGS(fsm->data.flags, LED_OFF);
+    }
+    break;
+
+  case topic[TURN_ALARM]:
+    tmp = atoi(data);
+    if (tmp > 0)
+    {
+      SET_FLAGS(fsm->data.flags, ALARM_ON);
+    } else
+    {
+      SET_FLAGS(fsm->data.flags, ALARM_OFF);
+    }
+    break;
+
+  case topic[COLOR_LED]:
+    tmp = atoi(data);
+
+    aux->rColor = (tmp & 0x00FF0000) >> 16;
+    aux->gColor = (tmp & 0x0000FF00) >> 8;
+    aux->bColor = (tmp & 0x000000FF);
+  break;
+
+  
+  default:
+    break;
+  }
+
 }
 
-int checkFlagColorLed(fsm_t* this, flags_t flags) {
-    return flags.LED_COLOR;
+void publishData(fsm_t* this)
+{
+  char data[64];
+  uint16_t len;
+
+  fsm_event_t* fsm = (fsm_event_t*)this;
+  CLEAR_FLAGS(fsm->data.flags, SEND_DATA);
+  int* topic_id = fsm->data.topic_index;
+
+  len = sprintf(data, "%d", fsm->data.sensorData->hum);
+  topic_publish(topic_id[SENSOR_HUM], data, len);
+  vTaskDelay(10);
+
+  len = sprintf(data, "%d", fsm->data.sensorData->light);
+  topic_publish(topic_id[SENSOR_LIGHT], data, len);
+  vTaskDelay(10);
+
+  len = sprintf(data, "%d", fsm->data.sensorData->temp);
+  topic_publish(topic_id[SENSOR_TEMP], data, len);
+  vTaskDelay(10);
 }
 
-int checkFlagAlarmaOn(fsm_t* this, flags_t flags) {
-    return flags.ALARM_ON;
-}
-
-int checkFlagAlarmaOff(fsm_t* this, flags_t flags) {
-    return flags.ALARM_OFF;
-}
-
-//funciones de activación
-
-
-void sendDataSensores ( fsm_t* this ) {
-    //Enviamos los datos recogidos por los sensores
-}
-
-
-void onLed ( fsm_t* this ) {
-	//Damos la orden de encender los leds
-}
-
-
-void offLed ( fsm_t* this ) {
-    //Damos la orden de apagar los leds
-}
-
-void colorLed ( fsm_t* this ) {
-    //Damos la orden de cambiar el color de los leds
-}
-
-
-void alarmaOn ( fsm_t* this ) {
-    //Damos la orden de encender la alarma
-}
-
-void alarmaOff ( fsm_t* this ) {
-    //Damos la orden de apagar la alarma
-}
-
-
-//tabla de transiciones
-
-static fsm_trans_t eventos_fsm[] = {
-  { IDLE,   checkStart,             COMM,     NULL              },
-  { COMM,   checkFlagSensor,        COMM,     sendDataSensores  },
-  { COMM,   checkFlagEnciendeLed,   COMM,     onLed             },
-  { COMM,   checkFlagApagaLed,      COMM,     offLed            },
-  { COMM,   checkFlagColorLed,      COMM,     colorLed          },
-  { COMM,   checkFlagAlarmaOn,      COMM,     alarmaOn          },
-  { COMM,   checkFlagAlarmaOff,     COMM,     alarmaOff         },
-  { COMM,   checkSystemReset,       IDLE,     NULL              },
-  {-1, NULL, -1, NULL },
-};
-
-*/

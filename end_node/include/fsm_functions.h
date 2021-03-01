@@ -79,6 +79,16 @@ void startTimerSensor ( fsm_t* this );
 void readData ( fsm_t* this ) ;
 void sendData ( fsm_t* this ) ;
 
+//Event functions
+
+int checkFlagInData( fsm_t* this);
+int checkFlagOutData( fsm_t* this);
+
+void publishData(fsm_t* this);
+void processData(fsm_t* this);
+ 
+
+
 /******************************** Tables ********************************/
 
 
@@ -103,7 +113,14 @@ static fsm_trans_t led_fsm[] =
   {-1, NULL, -1, NULL },
 };
 
-//tabla de transiciones
+
+static fsm_trans_t eventos_fsm[] = {
+  { IDLE,   checkStart,             COMM,     NULL          },
+  { COMM,   checkFlagInData,        COMM,     processData   },
+  { COMM,   checkFlagOutData,       COMM,     publishData   },
+  { COMM,   checkSystemReset,       IDLE,     NULL          },
+  {-1, NULL, -1, NULL },
+};
 
 
 

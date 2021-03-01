@@ -32,6 +32,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stddef.h>
+#include <stdlib.h>
 #include <string.h>
 #include "esp_wifi.h"
 #include "esp_system.h"
@@ -63,7 +64,7 @@
 #define CONFIG_BROKER_URL    "mqtt://192.168.1.142:1883"
 #define SSID     "test"
 #define PASSWORD "test"
-
+#define NTOPICS    6
 /******************************** Types   **********************************/
 
 typedef enum 
@@ -91,10 +92,25 @@ typedef enum
 }flags_t;
 
 
+typedef enum
+{
+    TURN_LED        = 0,
+    TURN_ALARM      = 1,
+    COLOR_LED       = 2,
+    SENSOR_TEMP     = 3,
+    SENSOR_HUM      = 4,
+    SENSOR_LIGHT    = 5
+}topic_index_t;
+
 /******************************** Variables ********************************/
 
 extern uint32_t flags;
-
+/*
+static char* topics [] = 
+{
+    "/"
+}
+*/
 /******************************** Prototypes *******************************/
 
 
