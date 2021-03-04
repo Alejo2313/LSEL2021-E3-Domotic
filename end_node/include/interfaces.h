@@ -29,6 +29,15 @@
 
 #include "defines.h"
 
+/****************************  Generic structuture ****************************/
+
+typedef struct 
+{
+    fsm_t* fsm;
+    uint32_t * flags;
+}fsm_generic_t;
+
+
 /****************************  LED structutures ****************************/
 
 /**
@@ -63,7 +72,7 @@ typedef struct
  */
 typedef struct 
 {
-    fsm_t fsm;
+    fsm_t* fsm;
     led_data_t data;
     led_interface_t interface;
 
@@ -106,7 +115,7 @@ typedef struct
  */
 typedef struct 
 {
-    fsm_t fsm;
+    fsm_t* fsm;
     control_data_t data;
     control_interface_t interface;
     
@@ -149,7 +158,7 @@ typedef struct
  */
 typedef struct 
 {
-    fsm_t fsm;
+    fsm_t* fsm;
     sensor_data_t data;
     sensor_interface_t interface;
     
@@ -166,6 +175,7 @@ typedef struct
 
     int (*getData)( char** data, uint16_t* size );                          //<! Get input data
     void (*sendData)(int topicId, const char* data, uint16_t len );         //<! Send data
+    void (*delayMs)(uint16_t ms);
 
 }event_interface_t;
 
@@ -189,7 +199,7 @@ typedef struct
  */
 typedef struct 
 {
-    fsm_t fsm;
+    fsm_t* fsm;
     event_data_t data;
     event_interface_t interface;
 

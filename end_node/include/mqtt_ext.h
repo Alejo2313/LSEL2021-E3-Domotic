@@ -30,11 +30,11 @@
 
 /******************************** Includes *********************************/
 
-#include <stdint.h>
-#include <stdio.h>
+
 #include "defines.h"
 #include "mqtt_client.h"
-#include "esp_log.h"
+#include "platform.h"
+
 
 /******************************** Defines **********************************/
 

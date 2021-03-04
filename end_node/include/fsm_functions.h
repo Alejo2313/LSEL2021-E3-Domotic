@@ -47,13 +47,13 @@ enum led_state {
 
 
 enum sensor_state {
-  IDLE,
+//  IDLE,
   WAIT,
   READ
 };
 
-enum sensor_state {
-  IDLE,
+enum event_state {
+//  IDLE,
   COMM
 };
 
@@ -74,7 +74,7 @@ void turnOffLed ( fsm_t* this ) ;
 //Sensor Functions
 int checkTimerSensor( fsm_t* this );
 
-inline int isTrue( fsm_t* this ) ;
+int isTrue( fsm_t* this ) ;
 void startTimerSensor ( fsm_t* this );
 void readData ( fsm_t* this ) ;
 void sendData ( fsm_t* this ) ;

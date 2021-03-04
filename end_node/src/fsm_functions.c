@@ -143,7 +143,7 @@ int checkTimerSensor( fsm_t* this )
 
 }
 
-inline int isTrue( fsm_t* this ) 
+int isTrue( fsm_t* this ) 
 {
   return 1;
 }
@@ -214,13 +214,20 @@ void processData(fsm_t* this)
   int tmp;
   led_data_t* aux;
 
+
+
   fsm_event_t* fsm = (fsm_event_t*)this;
   topic = fsm->data.topic_index;
   aux = fsm->data.colorLEDData;
 
   CLEAR_FLAGS(fsm->data.flags, MQTT_NEWDATA);
 
-  index = getIncomeData(&data, &size);
+  index = fsm->interface.getData(&data, &size);
+
+  //Error de concepto, "0" está por defecto en todos los topics
+  //redefinir función de asignación de topics para asignarlos manualmente
+
+  /*
   switch (index)
   {
   case topic[TURN_LED]:
@@ -257,7 +264,7 @@ void processData(fsm_t* this)
   default:
     break;
   }
-
+*/
 }
 
 void publishData(fsm_t* this)
@@ -270,15 +277,15 @@ void publishData(fsm_t* this)
   int* topic_id = fsm->data.topic_index;
 
   len = sprintf(data, "%d", fsm->data.sensorData->hum);
-  topic_publish(topic_id[SENSOR_HUM], data, len);
-  vTaskDelay(10);
+  fsm->interface.sendData(topic_id[SENSOR_HUM], data, len);
+  fsm->interface.delayMs(10);
 
   len = sprintf(data, "%d", fsm->data.sensorData->light);
-  topic_publish(topic_id[SENSOR_LIGHT], data, len);
-  vTaskDelay(10);
+  fsm->interface.sendData(topic_id[SENSOR_LIGHT], data, len);
+  fsm->interface.delayMs(10);
 
   len = sprintf(data, "%d", fsm->data.sensorData->temp);
-  topic_publish(topic_id[SENSOR_TEMP], data, len);
-  vTaskDelay(10);
+  fsm->interface.sendData(topic_id[SENSOR_TEMP], data, len);
+  fsm->interface.delayMs(10);
 }
 

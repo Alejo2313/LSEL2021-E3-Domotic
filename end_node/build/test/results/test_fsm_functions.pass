@@ -1,0 +1,18 @@
+---
+:source:
+  :path: test
+  :file: test_fsm_functions.c
+:successes:
+- :test: test_fsm_functions_checkStart
+  :line: 19
+  :message: ''
+  :unity_test_time: 0
+:failures: []
+:ignores: []
+:counts:
+  :total: 1
+  :passed: 1
+  :failed: 0
+  :ignored: 0
+:stdout: []
+:time: 0.010275299999193521
