@@ -103,9 +103,11 @@ typedef struct
 typedef struct 
 {
 
-    uint32_t* flags;    //<! Pointer to flags
+    uint32_t* flags;                //<! Pointer to flags
 
-    uint32_t btnPin;    //<! Button GPIO
+    uint32_t btnPin;                //<! Button GPIO
+    uint64_t tickCounter;           //<! System Tick counter
+
 
 }control_data_t;
 

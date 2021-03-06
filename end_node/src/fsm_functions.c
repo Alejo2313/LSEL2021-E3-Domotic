@@ -38,7 +38,12 @@
 
 /******************************** Functions ********************************/
 
-
+/**
+ * @brief checks if flag START is enabled
+ * 
+ * @param this: fsm structure used
+ * @return int: flag START's value 
+ */
 int checkStart( fsm_t* this )
 {
 
@@ -47,6 +52,12 @@ int checkStart( fsm_t* this )
 
 }
 
+/**
+ * @brief checks if flag LED_ON is enabled
+ * 
+ * @param this: fsm structure used
+ * @return int: flag LED_ON's value 
+ */
 int checkOnLed( fsm_t* this )
 {
 
@@ -55,6 +66,12 @@ int checkOnLed( fsm_t* this )
 
 }
 
+/**
+ * @brief checks if flag LED_OFF is enabled
+ * 
+ * @param this: fsm structure used
+ * @return int: flag LED_OFF's value 
+ */
 int checkOffLed( fsm_t* this )
 {
 
@@ -63,6 +80,12 @@ int checkOffLed( fsm_t* this )
 
 }
 
+/**
+ * @brief checks if flag LED_COLOR is enabled
+ * 
+ * @param this: fsm structure used
+ * @return int: flag LED_COLOR's value 
+ */
 int checkColorChange( fsm_t* this )
 {
 
@@ -71,14 +94,24 @@ int checkColorChange( fsm_t* this )
 
 }
 
+/**
+ * @brief checks if flag START is disabled
+ * 
+ * @param this: fsm structure used
+ * @return int: flag START's value inverted 
+ */
 int checkSystemReset( fsm_t* this )
 {
   fsm_led_t* fsm = (fsm_led_t*)this;
 	return !IS_FLAG(fsm->data.flags, START);
 }
 
-//funciones de activación
 
+/**
+ * @brief turns the leds with the default PWM duty cycle value
+ * 
+ * @param this fsm structure used
+ */
 void turnOnLed ( fsm_t* this )
 {
 
@@ -92,6 +125,11 @@ void turnOnLed ( fsm_t* this )
   
 }
 
+/**
+ * @brief changes the leds colors by modifying the PWM duty cycle
+ * 
+ * @param this 
+ */
 void changeColor ( fsm_t* this ) 
 {
 
@@ -105,6 +143,11 @@ void changeColor ( fsm_t* this )
 
 }
 
+/**
+ * @brief turns the leds off by setting the PWM duty cycles to 0
+ * 
+ * @param this 
+ */
 void turnOffLed ( fsm_t* this ) 
 {
 
@@ -118,13 +161,13 @@ void turnOffLed ( fsm_t* this )
 }
 
 
-//GENERIC SENSOR FSM
 
-
-
-
-//funciones de guarda
-
+/**
+ * @brief checks whether the time between read operations to sensors is over
+ * 
+ * @param this fsm structure used
+ * @return int 1 if the time is over, 0 if it is not
+ */
 int checkTimerSensor( fsm_t* this ) 
 {
 	//devuelve el valor del flag que nos informa de que el timer se ha cumplido
@@ -143,14 +186,23 @@ int checkTimerSensor( fsm_t* this )
 
 }
 
+/**
+ * @brief always returns 1
+ * 
+ * @param this fsm structure used
+ * @return int always true (1)
+ */
 int isTrue( fsm_t* this ) 
 {
   return 1;
 }
 
-//funciones de activación
 
-
+/**
+ * @brief start the timer between read operations of sensors
+ * 
+ * @param this fsm structure used
+ */
 void startTimerSensor ( fsm_t* this ) 
 {
 
@@ -160,7 +212,11 @@ void startTimerSensor ( fsm_t* this )
 
 }
 
-
+/**
+ * @brief reads sensors data and saves them in the appropriate structure
+ * 
+ * @param this 
+ */
 void readData ( fsm_t* this ) 
 {
 
@@ -174,6 +230,11 @@ void readData ( fsm_t* this )
 
 //Queue¿?
 
+/**
+ * @brief enables SEND_DATA flag and starts timer between read operations
+ * 
+ * @param this fsm structure used
+ */
 void sendData ( fsm_t* this ) 
 {
   fsm_sensor_t* fsm = (fsm_sensor_t*)this;
@@ -185,26 +246,36 @@ void sendData ( fsm_t* this )
 }
 
 
-//EVENTOS FSM
-
+/**
+ * @brief checks if SEND_DATA flag is enabled
+ * 
+ * @param this fsm structure used
+ * @return int SEND_DATA's value
+ */
 int checkFlagOutData( fsm_t* this ) 
 {
   fsm_event_t* fsm = (fsm_event_t*)this;
   return IS_FLAG(fsm->data.flags, SEND_DATA);
 }
 
+/**
+ * @brief checks if MQTT_NEWDATA flag is enabled
+ * 
+ * @param this fsm structure used
+ * @return int MQTT_NEWDATA's value
+ */
 int checkFlagInData( fsm_t* this ) 
 {
   fsm_event_t* fsm = (fsm_event_t*)this;
   return IS_FLAG(fsm->data.flags, MQTT_NEWDATA);
 }
 
-/**
- * @brief 
- * 
- * @param this 
- */
 
+/**
+ * @brief collects the received data and enables the appropriate flags according to the incoming information  
+ * 
+ * @param this fsm structure used
+ */
 void processData(fsm_t* this)
 {
   char* data;
@@ -267,6 +338,11 @@ void processData(fsm_t* this)
 */
 }
 
+/**
+ * @brief sends the sensor's values collected previously to the gateway
+ * 
+ * @param this fsm structure used
+ */
 void publishData(fsm_t* this)
 {
   char data[64];
@@ -289,3 +365,149 @@ void publishData(fsm_t* this)
   fsm->interface.delayMs(10);
 }
 
+
+
+/**
+ * @brief checks if the device is both connected to MQTT and WiFi
+ * 
+ * @param this fsm structure used
+ * @return int 1 if it is connected, 0 if any of the connections is down
+ */
+int checkConnected(fsm_t* this)
+{
+  fsm_control_t fsm = (fsm_control_t*)this;
+  return IS_FLAG(fsm->data.flags, MQTT_CONNECTED && WIFI_CONNECTED);
+}
+
+
+/**
+ * @brief checks if the device is both connected to MQTT and WiFi
+ * 
+ * @param this fsm structure used
+ * @return int 0 if it is connected, 1 if any of the connections is down
+ */
+int checkNotConnected(fsm_t* this)
+{
+  fsm_control_t* fsm = (fsm_control_t*)this;
+  return !IS_FLAG(fsm->data.flags, MQTT_CONNECTED && WIFI_CONNECTED);
+}
+
+/**
+ * @brief checks if the device is appropriately configured
+ * 
+ * @param this fsm structure used
+ * @return int 1 if it is configured, 0 if not
+ */
+int checkNotConfigured(fsm_t* this)
+{
+  fsm_control_t* fsm = (fsm_control_t*)this;
+  return IS_FLAG(fsm->data.flags, CONFIGURE);
+}
+
+/**
+ * @brief checks if the button is being pressed
+ * 
+ * @param this fsm structure used
+ * @return int 1 if it is being pressed, 0 if not
+ */
+int checkButton(fsm_t* this)
+{
+  fsm_control_t* fsm = (fsm_control_t*)this;
+  return fsm->interface.readGPIO();
+}
+
+/**
+ * @brief checks if the timer associated to the button has reached a predefined value
+ * 
+ * @param this fsm structure used
+ * @return int 1 if it has, 0 if not
+ */
+int checkTimerHigher(fsm_t* this)
+{
+  fsm_control_t* fsm = (fsm_control_t*)this;
+
+  if( fsm->interface.getTickCount() - fsm->data.tickCounter > BUTTON_TIME )
+  {
+    return 1;
+  }
+  return 0;
+}
+
+/**
+ * @brief checks if the timer associated to the button has reached a predefined value
+ * 
+ * @param this fsm structure used
+ * @return int 0 if it has, 1 if not
+ */
+int checkTimerLower(fsm_t* this)
+{
+  fsm_control_t* fsm = (fsm_control_t*)this;
+
+  if( fsm->interface.getTickCount() - fsm->data.tickCounter < BUTTON_TIME )
+  {
+    return 1;
+  }
+  return 0;
+}
+
+/**
+ * @brief checks if the timer associated to the button has reached a predefined value, and the button is being pressed at the same time
+ * 
+ * @param this fsm structure used
+ * @return int 1 if it has not and the button is being pressed, 0 otherwise
+ */
+int checkNotButtonTimerLower(fsm_t* this)
+{
+  fsm_control_t* fsm = (fsm_control_t*)this;
+
+  if( (fsm->interface.getTickCount() - fsm->data.tickCounter < BUTTON_TIME) && (!fsm->interface.readGPIO()))
+  {
+    return 1;
+  }
+    return 0;
+}
+
+/**
+ * @brief sets both MQTT and WiFi flags to 1
+ * 
+ * @param this fsm structure used
+ */
+void enableConnect(fsm_t* this)
+{
+  fsm_control_t* fsm = (fsm_control_t*)this;
+  SET_FLAGS(fsm->data.flags(), MQTT_CONNECTED);
+  SET_FLAGS(fsm->data.flags(), WIFI_CONNECTED);
+}
+
+/**
+ * @brief sets CONFIGURE flag to 1
+ * 
+ * @param this fsm structure used
+ */
+void enableEnterConfig(fsm_t* this)
+{
+  fsm_control_t* fsm = (fsm_control_t*)this;
+  SET_FLAGS(fsm->data.flags(), CONFIGURE);
+}
+
+/**
+ * @brief starts the timer associated to the button
+ * 
+ * @param this fsm structure used
+ */
+void startTimerButton (fsm_t* this) 
+{
+  fsm_control_t* fsm = (fsm_control_t*)this;
+  fsm->data.tickCounter = fsm->interface.getTickCount();
+}
+
+/**
+ * @brief sets START flag to 1
+ * 
+ * @param this fsm structure used
+ */
+void enableStart(fsm_t* this)
+{
+  fsm_control_t* fsm = (fsm_control_t*)this;
+  SET_FLAGS(fsm->data.flags(), START);
+}

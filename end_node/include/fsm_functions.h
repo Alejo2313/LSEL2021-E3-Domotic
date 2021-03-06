@@ -36,6 +36,8 @@
 
 #define DEFAULT_DUTY      50
 #define SENSOR_TICK_RATE  1000
+#define BUTTON_TIME       10
+
 
 /******************************** Variables ********************************/
 
@@ -52,9 +54,20 @@ enum sensor_state {
   READ
 };
 
+
 enum event_state {
 //  IDLE,
   COMM
+};
+
+
+enum control_state {
+//  IDLE,
+  CONNECT,
+  BTN_IDLE,
+  CONF_MODE,
+  BTN_CONNECT,
+  WAIT_RETRY
 };
 
 /******************************** Prototypes *******************************/
@@ -71,6 +84,7 @@ void turnOnLed ( fsm_t* this );
 void changeColor ( fsm_t* this ) ;
 void turnOffLed ( fsm_t* this ) ;
 
+
 //Sensor Functions
 int checkTimerSensor( fsm_t* this );
 
@@ -79,14 +93,29 @@ void startTimerSensor ( fsm_t* this );
 void readData ( fsm_t* this ) ;
 void sendData ( fsm_t* this ) ;
 
-//Event functions
 
+//Event functions
 int checkFlagInData( fsm_t* this);
 int checkFlagOutData( fsm_t* this);
 
 void publishData(fsm_t* this);
 void processData(fsm_t* this);
  
+
+//Control functions
+int checkConnected(fsm_t* this);
+int checkNotConnected(fsm_t* this);
+int checkNotConfigured(fsm_t* this);
+int checkButton(fsm_t* this);
+int checkTimerHigher(fsm_t* this);
+int checkTimerLower(fsm_t* this);
+int checkNotButtonTimerLower(fsm_t* this);
+
+void enableConnect(fsm_t* this);
+void enableEnterConfig(fsm_t* this);
+void startTimerButton (fsm_t* this); 
+void enableStart(fsm_t* this);
+
 
 
 /******************************** Tables ********************************/
@@ -123,5 +152,19 @@ static fsm_trans_t eventos_fsm[] = {
 };
 
 
+static fsm_trans_t control_fsm[] = {
+  { IDLE,         checkNotConnected,          CONNECT,      enableConnect     },
+  { IDLE,         checkButton,                BTN_IDLE,     startTimerButton  },
+  { CONNECT,      checkConnected,             IDLE,         enableStart       },
+  { CONNECT,      checkNotConnected,          WAIT_RETRY,   startTimerButton  },
+  { BTN_IDLE,     checkTimerHigher,           CONF_MODE,    enableEnterConfig },
+  { BTN_IDLE,     checkNotButtonTimerLower,   IDLE,         NULL              },
+  { CONF_MODE,    checkNotConfigured,         CONNECT,      enableConnect     },
+  { WAIT_RETRY,   checkTimerHigher,           CONNECT,      enableConnect     },
+  { WAIT_RETRY,   checkButton,                BTN_CONNECT,  startTimerButton  },
+  { BTN_CONNECT,  checkNotButtonTimerLower,   WAIT_RETRY,   NULL              },
+  { BTN_CONNECT,  checkTimerHigher,           CONF_MODE,    enableEnterConfig },
+  {-1, NULL, -1, NULL },
+};
 
 #endif
