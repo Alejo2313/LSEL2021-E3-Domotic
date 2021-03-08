@@ -103,6 +103,7 @@ int checkColorChange( fsm_t* this )
 int checkSystemReset( fsm_t* this )
 {
   fsm_led_t* fsm = (fsm_led_t*)this;
+
 	return !IS_FLAG(fsm->data.flags, START);
 }
 
@@ -138,8 +139,8 @@ void changeColor ( fsm_t* this )
   CLEAR_FLAGS(fsm->data.flags, LED_COLOR);
 
   fsm->interface.pwmSet(fsm->data.rPin, fsm->data.rColor);
-  fsm->interface.pwmSet(fsm->data.rPin, fsm->data.gColor);
-  fsm->interface.pwmSet(fsm->data.rPin, fsm->data.bColor);
+  fsm->interface.pwmSet(fsm->data.gPin, fsm->data.gColor);
+  fsm->interface.pwmSet(fsm->data.bPin, fsm->data.bColor);
 
 }
 
@@ -174,7 +175,7 @@ int checkTimerSensor( fsm_t* this )
 
   fsm_sensor_t* fsm = (fsm_sensor_t*)this;
 
-  if( fsm->interface.getTickCount() - fsm->data.tickCounter > SENSOR_TICK_RATE )
+  if( fsm->interface.getTickCount() - fsm->data.tickCounter >= SENSOR_TICK_RATE )
   {
 
     fsm->data.tickCounter = fsm->interface.getTickCount();
@@ -282,50 +283,48 @@ void processData(fsm_t* this)
   uint16_t size;
   int index;
   int* topic;
-  int tmp;
+  uint32_t tmp;
+
   led_data_t* aux;
 
-
-
   fsm_event_t* fsm = (fsm_event_t*)this;
-  topic = fsm->data.topic_index;
   aux = fsm->data.colorLEDData;
 
   CLEAR_FLAGS(fsm->data.flags, MQTT_NEWDATA);
 
   index = fsm->interface.getData(&data, &size);
 
-  //Error de concepto, "0" está por defecto en todos los topics
-  //redefinir función de asignación de topics para asignarlos manualmente
-
-  /*
   switch (index)
   {
-  case topic[TURN_LED]:
+  case TURN_LED:
     tmp = atoi(data);
     if (tmp > 0)
     {
       SET_FLAGS(fsm->data.flags, LED_ON);
-    } else
+    } 
+    else
     {
       SET_FLAGS(fsm->data.flags, LED_OFF);
     }
     break;
 
-  case topic[TURN_ALARM]:
+  case TURN_ALARM:
     tmp = atoi(data);
     if (tmp > 0)
     {
       SET_FLAGS(fsm->data.flags, ALARM_ON);
-    } else
+    } 
+    else
     {
       SET_FLAGS(fsm->data.flags, ALARM_OFF);
     }
     break;
 
-  case topic[COLOR_LED]:
+  case COLOR_LED:
     tmp = atoi(data);
 
+    SET_FLAGS(fsm->data.flags, LED_COLOR);
+    
     aux->rColor = (tmp & 0x00FF0000) >> 16;
     aux->gColor = (tmp & 0x0000FF00) >> 8;
     aux->bColor = (tmp & 0x000000FF);
@@ -335,7 +334,7 @@ void processData(fsm_t* this)
   default:
     break;
   }
-*/
+
 }
 
 /**
@@ -350,18 +349,17 @@ void publishData(fsm_t* this)
 
   fsm_event_t* fsm = (fsm_event_t*)this;
   CLEAR_FLAGS(fsm->data.flags, SEND_DATA);
-  int* topic_id = fsm->data.topic_index;
 
   len = sprintf(data, "%d", fsm->data.sensorData->hum);
-  fsm->interface.sendData(topic_id[SENSOR_HUM], data, len);
+  fsm->interface.sendData(SENSOR_HUM, data, len);
   fsm->interface.delayMs(10);
 
   len = sprintf(data, "%d", fsm->data.sensorData->light);
-  fsm->interface.sendData(topic_id[SENSOR_LIGHT], data, len);
+  fsm->interface.sendData(SENSOR_LIGHT, data, len);
   fsm->interface.delayMs(10);
 
   len = sprintf(data, "%d", fsm->data.sensorData->temp);
-  fsm->interface.sendData(topic_id[SENSOR_TEMP], data, len);
+  fsm->interface.sendData(SENSOR_TEMP, data, len);
   fsm->interface.delayMs(10);
 }
 
@@ -375,7 +373,8 @@ void publishData(fsm_t* this)
  */
 int checkConnected(fsm_t* this)
 {
-  fsm_control_t fsm = (fsm_control_t*)this;
+  fsm_control_t* fsm = (fsm_control_t*)this;
+
   return IS_FLAG(fsm->data.flags, MQTT_CONNECTED && WIFI_CONNECTED);
 }
 
@@ -389,7 +388,7 @@ int checkConnected(fsm_t* this)
 int checkNotConnected(fsm_t* this)
 {
   fsm_control_t* fsm = (fsm_control_t*)this;
-  return !IS_FLAG(fsm->data.flags, MQTT_CONNECTED && WIFI_CONNECTED);
+  return !IS_FLAG(fsm->data.flags, MQTT_CONNECTED | WIFI_CONNECTED);
 }
 
 /**
@@ -413,7 +412,9 @@ int checkNotConfigured(fsm_t* this)
 int checkButton(fsm_t* this)
 {
   fsm_control_t* fsm = (fsm_control_t*)this;
-  return fsm->interface.readGPIO();
+  uint32_t btnPin = fsm->data.btnPin;
+  
+  return fsm->interface.readGPIO(btnPin);
 }
 
 /**
@@ -459,8 +460,9 @@ int checkTimerLower(fsm_t* this)
 int checkNotButtonTimerLower(fsm_t* this)
 {
   fsm_control_t* fsm = (fsm_control_t*)this;
+  uint32_t btnPin = fsm->data.btnPin;
 
-  if( (fsm->interface.getTickCount() - fsm->data.tickCounter < BUTTON_TIME) && (!fsm->interface.readGPIO()))
+  if( (fsm->interface.getTickCount() - fsm->data.tickCounter < BUTTON_TIME) && (!fsm->interface.readGPIO(btnPin)))
   {
     return 1;
   }
@@ -475,8 +477,8 @@ int checkNotButtonTimerLower(fsm_t* this)
 void enableConnect(fsm_t* this)
 {
   fsm_control_t* fsm = (fsm_control_t*)this;
-  SET_FLAGS(fsm->data.flags(), MQTT_CONNECTED);
-  SET_FLAGS(fsm->data.flags(), WIFI_CONNECTED);
+  SET_FLAGS(fsm->data.flags, MQTT_CONNECTED);
+  SET_FLAGS(fsm->data.flags, WIFI_CONNECTED);
 }
 
 /**
@@ -487,7 +489,7 @@ void enableConnect(fsm_t* this)
 void enableEnterConfig(fsm_t* this)
 {
   fsm_control_t* fsm = (fsm_control_t*)this;
-  SET_FLAGS(fsm->data.flags(), CONFIGURE);
+  SET_FLAGS(fsm->data.flags, CONFIGURE);
 }
 
 /**
@@ -509,5 +511,5 @@ void startTimerButton (fsm_t* this)
 void enableStart(fsm_t* this)
 {
   fsm_control_t* fsm = (fsm_control_t*)this;
-  SET_FLAGS(fsm->data.flags(), START);
+  SET_FLAGS(fsm->data.flags, START);
 }

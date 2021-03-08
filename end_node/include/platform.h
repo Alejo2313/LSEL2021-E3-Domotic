@@ -20,4 +20,24 @@
 
 #include "esp_log.h"
 
+
+
+void setPWM (uint32_t GPIO, uint8_t dutyCycle);
+void resetGPIO(uint32_t GPIO);
+void setGPIO(uint32_t GPIO);
+uint64_t getTickCount();
+int readHum();
+int readTemp();
+int readLight();
+int getData_mqtt( char** data, uint16_t* size );                          
+void sendData_mqtt(int topicId, const char* data, uint16_t len );         
+void delayMs(uint16_t ms);
+void enterConfigMode(void);
+void mqttConnect(void);
+void wifiConnect(void);
+int readGPIO(uint32_t GPIO);
+
+
+
+
 #endif // DEBUG

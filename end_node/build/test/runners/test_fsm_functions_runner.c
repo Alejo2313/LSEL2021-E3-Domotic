@@ -10,7 +10,10 @@ char* GlobalOrderError;
 /*=======External Functions This Runner Calls=====*/
 extern void setUp(void);
 extern void tearDown(void);
-extern void test_fsm_functions_checkStart(void);
+extern void test_macros(void);
+extern void test_fsm_functions_led(void);
+extern void test_fsm_sensor(void);
+extern void test_fsm_event(void);
 
 
 /*=======Mock Management=====*/
@@ -75,7 +78,10 @@ static void run_test(UnityTestFunction func, const char* name, UNITY_LINE_TYPE l
 int main(void)
 {
   UnityBegin("test_fsm_functions.c");
-  run_test(test_fsm_functions_checkStart, "test_fsm_functions_checkStart", 19);
+  run_test(test_macros, "test_macros", 147);
+  run_test(test_fsm_functions_led, "test_fsm_functions_led", 168);
+  run_test(test_fsm_sensor, "test_fsm_sensor", 198);
+  run_test(test_fsm_event, "test_fsm_event", 220);
 
   return UnityEnd();
 }

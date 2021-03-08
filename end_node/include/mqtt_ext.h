@@ -94,7 +94,7 @@ int getTopicIndex ( const char* topic );
  * @param topic Topic to suscribe
  * @return int  Assigned topic index
  */
-int topic_subscribe( const char* topic );
+void topic_subscribe( const char* topic, uint8_t topicIndex );
 
 /**
  * @brief Publish data into specific topic

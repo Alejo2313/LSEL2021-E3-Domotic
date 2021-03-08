@@ -122,15 +122,14 @@ int getTopicIndex ( const char* topic )
  * @param topic Topic to suscribe
  * @return int  Assigned topic index
  */
-int topic_subscribe( const char* topic )
+void topic_subscribe( const char* topic, uint8_t topicIndex )
 {
-    if ( IS_FLAG(prtFlags, MQTT_CONNECTED | WIFI_CONNECTED) && topicCounter < TOPIC_MAX )
+    if ( IS_FLAG(prtFlags, MQTT_CONNECTED | WIFI_CONNECTED) && topicIndex < TOPIC_MAX )
     {
         esp_mqtt_client_subscribe( client, topic, 0 );
-        strcpy( topicsSubs[topicCounter++], topic );
-        return (topicCounter - 1);
+        strcpy( topicsSubs[topicIndex], topic );
     }
-    return -1 ;
+
 };
 
 /**
