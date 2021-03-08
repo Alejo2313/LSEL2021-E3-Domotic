@@ -47,8 +47,9 @@
 int checkStart( fsm_t* this )
 {
 
-  fsm_led_t* fsm = (fsm_led_t*)this;
-	return IS_FLAG(fsm->data.flags, START);
+  fsm_generic_t* fsm = (fsm_generic_t*)this;
+
+	return IS_FLAG(fsm->flags, START);
 
 }
 
@@ -178,7 +179,6 @@ int checkTimerSensor( fsm_t* this )
   if( fsm->interface.getTickCount() - fsm->data.tickCounter >= SENSOR_TICK_RATE )
   {
 
-    fsm->data.tickCounter = fsm->interface.getTickCount();
     return 1;
 
   }
@@ -375,7 +375,7 @@ int checkConnected(fsm_t* this)
 {
   fsm_control_t* fsm = (fsm_control_t*)this;
 
-  return IS_FLAG(fsm->data.flags, MQTT_CONNECTED && WIFI_CONNECTED);
+  return IS_FLAG(fsm->data.flags, MQTT_CONNECTED) && IS_FLAG(fsm->data.flags, WIFI_CONNECTED);
 }
 
 
@@ -388,7 +388,7 @@ int checkConnected(fsm_t* this)
 int checkNotConnected(fsm_t* this)
 {
   fsm_control_t* fsm = (fsm_control_t*)this;
-  return !IS_FLAG(fsm->data.flags, MQTT_CONNECTED | WIFI_CONNECTED);
+  return !(IS_FLAG(fsm->data.flags, MQTT_CONNECTED) && IS_FLAG(fsm->data.flags, WIFI_CONNECTED));
 }
 
 /**
@@ -400,7 +400,7 @@ int checkNotConnected(fsm_t* this)
 int checkNotConfigured(fsm_t* this)
 {
   fsm_control_t* fsm = (fsm_control_t*)this;
-  return IS_FLAG(fsm->data.flags, CONFIGURE);
+  return !IS_FLAG(fsm->data.flags, CONFIGURE);
 }
 
 /**
@@ -427,7 +427,7 @@ int checkTimerHigher(fsm_t* this)
 {
   fsm_control_t* fsm = (fsm_control_t*)this;
 
-  if( fsm->interface.getTickCount() - fsm->data.tickCounter > BUTTON_TIME )
+  if( fsm->interface.getTickCount() - fsm->data.tickCounter >= BUTTON_TIME )
   {
     return 1;
   }
@@ -477,8 +477,9 @@ int checkNotButtonTimerLower(fsm_t* this)
 void enableConnect(fsm_t* this)
 {
   fsm_control_t* fsm = (fsm_control_t*)this;
-  SET_FLAGS(fsm->data.flags, MQTT_CONNECTED);
-  SET_FLAGS(fsm->data.flags, WIFI_CONNECTED);
+  fsm->interface.mqttConnect();
+  fsm->interface.wifiConnect();
+  CLEAR_FLAGS(fsm->data.flags, START);
 }
 
 /**

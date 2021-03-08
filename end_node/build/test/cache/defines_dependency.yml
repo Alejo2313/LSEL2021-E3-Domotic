@@ -3,3 +3,5 @@ src/fsm_functions.c:
 - TEST
 test/test_fsm_functions.c:
 - TEST
+src/fsm.c:
+- TEST

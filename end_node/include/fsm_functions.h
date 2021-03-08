@@ -42,14 +42,14 @@
 /******************************** Variables ********************************/
 
 enum led_state {
-  IDLE,
+ // IDLE,
   WAITING,
   LIGHT_ON
 };
 
 
 enum sensor_state {
-//  IDLE,
+  IDLE,
   WAIT,
   READ
 };
@@ -124,9 +124,9 @@ void enableStart(fsm_t* this);
 static fsm_trans_t sensor_fsm[] = {
   { IDLE,   checkStart,           WAIT,     startTimerSensor  },
   { WAIT,   checkTimerSensor,     READ,     readData          },
+  { READ,   checkSystemReset,     IDLE,     NULL              },
   { READ,   isTrue,               WAIT,     sendData          },
   { WAIT,   checkSystemReset,     IDLE,     NULL              },
-  { READ,   checkSystemReset,     IDLE,     NULL              },
   {-1, NULL, -1, NULL },
 };
 

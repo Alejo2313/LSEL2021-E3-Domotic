@@ -4,27 +4,35 @@
   :file: test_fsm_functions.c
 :successes:
 - :test: test_macros
-  :line: 147
+  :line: 148
   :message: ''
   :unity_test_time: 0
 - :test: test_fsm_functions_led
-  :line: 168
+  :line: 169
   :message: ''
   :unity_test_time: 0
 - :test: test_fsm_sensor
-  :line: 198
+  :line: 199
   :message: ''
   :unity_test_time: 0
-:failures:
 - :test: test_fsm_event
-  :line: 255
-  :message: Expected 1 Was 512
+  :line: 221
+  :message: ''
   :unity_test_time: 0
+- :test: test_fsm_control
+  :line: 263
+  :message: ''
+  :unity_test_time: 0
+- :test: test_fsm_sensor_1
+  :line: 290
+  :message: ''
+  :unity_test_time: 0
+:failures: []
 :ignores: []
 :counts:
-  :total: 4
-  :passed: 3
-  :failed: 1
+  :total: 6
+  :passed: 6
+  :failed: 0
   :ignored: 0
 :stdout:
 - 'setting PWM 50 on GPIO 2 '
@@ -36,4 +44,4 @@
 - 'setting PWM 0 on GPIO 2 '
 - 'setting PWM 0 on GPIO 5 '
 - 'setting PWM 0 on GPIO 3 '
-:time: 0.014656200000899844
+:time: 0.031165899999905378

@@ -14,6 +14,8 @@ extern void test_macros(void);
 extern void test_fsm_functions_led(void);
 extern void test_fsm_sensor(void);
 extern void test_fsm_event(void);
+extern void test_fsm_control(void);
+extern void test_fsm_sensor_1(void);
 
 
 /*=======Mock Management=====*/
@@ -78,10 +80,12 @@ static void run_test(UnityTestFunction func, const char* name, UNITY_LINE_TYPE l
 int main(void)
 {
   UnityBegin("test_fsm_functions.c");
-  run_test(test_macros, "test_macros", 147);
-  run_test(test_fsm_functions_led, "test_fsm_functions_led", 168);
-  run_test(test_fsm_sensor, "test_fsm_sensor", 198);
-  run_test(test_fsm_event, "test_fsm_event", 220);
+  run_test(test_macros, "test_macros", 148);
+  run_test(test_fsm_functions_led, "test_fsm_functions_led", 169);
+  run_test(test_fsm_sensor, "test_fsm_sensor", 199);
+  run_test(test_fsm_event, "test_fsm_event", 221);
+  run_test(test_fsm_control, "test_fsm_control", 263);
+  run_test(test_fsm_sensor_1, "test_fsm_sensor_1", 290);
 
   return UnityEnd();
 }

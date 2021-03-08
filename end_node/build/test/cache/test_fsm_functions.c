@@ -1,3 +1,4 @@
+#include "include/fsm.h"
 #include "include/fsm_functions.h"
 #include "/var/lib/gems/2.7.0/gems/ceedling-0.31.0/vendor/unity/src/unity.h"
 
@@ -16,7 +17,7 @@ uint32_t gpio = 0;
 
 int gpioVal = 0;
 
-uint32_t flags = 0;
+static uint32_t flags_test = 0;
 
 char mess[64];
 
@@ -70,13 +71,11 @@ fsm_sensor_t fsm_sensor =
 
 {
 
-    .fsm = &fsm,
-
     .data =
 
     {
 
-        .flags = &flags,
+        .flags = &flags_test,
 
         .hum = 0,
 
@@ -112,13 +111,13 @@ fsm_led_t fsm_led =
 
 {
 
-    .fsm = &fsm,
+
 
     .data =
 
     {
 
-        .flags = &flags,
+        .flags = &flags_test,
 
 
 
@@ -164,7 +163,7 @@ fsm_event_t fsm_event =
 
 {
 
-    .fsm = &fsm,
+
 
     .data =
 
@@ -172,7 +171,7 @@ fsm_event_t fsm_event =
 
         .colorLEDData = &(fsm_led.data),
 
-        .flags = &flags,
+        .flags =&flags_test,
 
         .sensorData = &(fsm_sensor.data),
 
@@ -198,7 +197,7 @@ fsm_control_t fsm_control =
 
 {
 
-    .fsm = &fsm,
+
 
     .data =
 
@@ -206,7 +205,7 @@ fsm_control_t fsm_control =
 
         .btnPin = 12,
 
-        .flags = &flags,
+        .flags = &flags_test,
 
         .tickCounter = 0
 
@@ -268,43 +267,43 @@ void test_macros(void)
 
 {
 
-    flags = 0;
+    flags_test =0;
 
 
 
-    ( *(&flags) |= (START) );
+    ( *(&flags_test) |= (START) );
 
-    do {if ((flags == START)) {} else {UnityFail( ((" Expression Evaluated To FALSE")), (UNITY_UINT)((UNITY_UINT)(152)));}} while(0);
-
-
-
-    flags = 0;
+    do {if ((flags_test == START)) {} else {UnityFail( ((" Expression Evaluated To FALSE")), (UNITY_UINT)((UNITY_UINT)(153)));}} while(0);
 
 
 
-    ( *(&flags) |= (START | LED_COLOR) );
-
-    do {if ((flags == (START | LED_COLOR))) {} else {UnityFail( ((" Expression Evaluated To FALSE")), (UNITY_UINT)((UNITY_UINT)(157)));}} while(0);
+    flags_test =0;
 
 
 
-    ( *(&flags) &= ~(START) );
+    ( *(&flags_test) |= (START | LED_COLOR) );
+
+    do {if ((flags_test == (START | LED_COLOR))) {} else {UnityFail( ((" Expression Evaluated To FALSE")), (UNITY_UINT)((UNITY_UINT)(158)));}} while(0);
 
 
 
-    do {if ((flags == LED_COLOR)) {} else {UnityFail( ((" Expression Evaluated To FALSE")), (UNITY_UINT)((UNITY_UINT)(161)));}} while(0);
+    ( *(&flags_test) &= ~(START) );
 
-    UnityAssertEqualNumber((UNITY_INT)((LED_COLOR)), (UNITY_INT)((( (*(&flags))&(LED_COLOR) ))), (
 
-   ((void *)0)
 
-   ), (UNITY_UINT)(162), UNITY_DISPLAY_STYLE_INT);
+    do {if ((flags_test == LED_COLOR)) {} else {UnityFail( ((" Expression Evaluated To FALSE")), (UNITY_UINT)((UNITY_UINT)(162)));}} while(0);
 
-    UnityAssertEqualNumber((UNITY_INT)((0)), (UNITY_INT)((( (*(&flags))&(START) ))), (
+    UnityAssertEqualNumber((UNITY_INT)((LED_COLOR)), (UNITY_INT)((( (*(&flags_test))&(LED_COLOR) ))), (
 
    ((void *)0)
 
    ), (UNITY_UINT)(163), UNITY_DISPLAY_STYLE_INT);
+
+    UnityAssertEqualNumber((UNITY_INT)((0)), (UNITY_INT)((( (*(&flags_test))&(START) ))), (
+
+   ((void *)0)
+
+   ), (UNITY_UINT)(164), UNITY_DISPLAY_STYLE_INT);
 
 
 
@@ -320,9 +319,9 @@ void test_fsm_functions_led(void)
 
 
 
-    flags = 0xFFFFFFFF;
+    flags_test =0xFFFFFFFF;
 
-    do {if ((flags&START)) {} else {UnityFail( ((" Expression Evaluated To FALSE")), (UNITY_UINT)((UNITY_UINT)(172)));}} while(0);
+    do {if ((flags_test & START)) {} else {UnityFail( ((" Expression Evaluated To FALSE")), (UNITY_UINT)((UNITY_UINT)(173)));}} while(0);
 
 
 
@@ -332,33 +331,33 @@ void test_fsm_functions_led(void)
 
    ((void *)0)
 
-   ), (UNITY_UINT)(175), UNITY_DISPLAY_STYLE_INT);
+   ), (UNITY_UINT)(176), UNITY_DISPLAY_STYLE_INT);
 
     UnityAssertEqualNumber((UNITY_INT)((LED_ON)), (UNITY_INT)((checkOnLed((fsm_t*)(&fsm_led)))), (
 
    ((void *)0)
 
-   ), (UNITY_UINT)(176), UNITY_DISPLAY_STYLE_INT);
+   ), (UNITY_UINT)(177), UNITY_DISPLAY_STYLE_INT);
 
     UnityAssertEqualNumber((UNITY_INT)((LED_OFF)), (UNITY_INT)((checkOffLed((fsm_t*)(&fsm_led)))), (
 
    ((void *)0)
 
-   ), (UNITY_UINT)(177), UNITY_DISPLAY_STYLE_INT);
+   ), (UNITY_UINT)(178), UNITY_DISPLAY_STYLE_INT);
 
     UnityAssertEqualNumber((UNITY_INT)((LED_COLOR)), (UNITY_INT)((checkColorChange((fsm_t*)(&fsm_led)))), (
 
    ((void *)0)
 
-   ), (UNITY_UINT)(178), UNITY_DISPLAY_STYLE_INT);
+   ), (UNITY_UINT)(179), UNITY_DISPLAY_STYLE_INT);
 
     UnityAssertEqualNumber((UNITY_INT)((0)), (UNITY_INT)((checkSystemReset((fsm_t*)(&fsm_led)))), (
 
    ((void *)0)
 
-   ), (UNITY_UINT)(179), UNITY_DISPLAY_STYLE_INT);
+   ), (UNITY_UINT)(180), UNITY_DISPLAY_STYLE_INT);
 
-    ( *(&flags) &= ~(START) );
+    ( *(&flags_test) &= ~(START) );
 
 
 
@@ -366,13 +365,13 @@ void test_fsm_functions_led(void)
 
    ((void *)0)
 
-   ), (UNITY_UINT)(182), UNITY_DISPLAY_STYLE_INT);
+   ), (UNITY_UINT)(183), UNITY_DISPLAY_STYLE_INT);
 
 
 
     turnOnLed ( (fsm_t*)(&fsm_led) );
 
-    do {if ((dCycle == 50)) {} else {UnityFail( ((" Expression Evaluated To FALSE")), (UNITY_UINT)((UNITY_UINT)(185)));}} while(0);
+    do {if ((dCycle == 50)) {} else {UnityFail( ((" Expression Evaluated To FALSE")), (UNITY_UINT)((UNITY_UINT)(186)));}} while(0);
 
 
 
@@ -380,13 +379,13 @@ void test_fsm_functions_led(void)
 
 
 
-    do {if ((dCycle == 10)) {} else {UnityFail( ((" Expression Evaluated To FALSE")), (UNITY_UINT)((UNITY_UINT)(189)));}} while(0);
+    do {if ((dCycle == 10)) {} else {UnityFail( ((" Expression Evaluated To FALSE")), (UNITY_UINT)((UNITY_UINT)(190)));}} while(0);
 
 
 
     turnOffLed ( (fsm_t*)(&fsm_led) ) ;
 
-    do {if ((dCycle == 0)) {} else {UnityFail( ((" Expression Evaluated To FALSE")), (UNITY_UINT)((UNITY_UINT)(192)));}} while(0);
+    do {if ((dCycle == 0)) {} else {UnityFail( ((" Expression Evaluated To FALSE")), (UNITY_UINT)((UNITY_UINT)(193)));}} while(0);
 
 
 
@@ -402,7 +401,7 @@ void test_fsm_sensor(void)
 
 {
 
-    flags = 0;
+    flags_test =0;
 
 
 
@@ -412,7 +411,7 @@ void test_fsm_sensor(void)
 
    ((void *)0)
 
-   ), (UNITY_UINT)(203), UNITY_DISPLAY_STYLE_INT);
+   ), (UNITY_UINT)(204), UNITY_DISPLAY_STYLE_INT);
 
     tick += 1000;
 
@@ -420,7 +419,7 @@ void test_fsm_sensor(void)
 
    ((void *)0)
 
-   ), (UNITY_UINT)(205), UNITY_DISPLAY_STYLE_INT);
+   ), (UNITY_UINT)(206), UNITY_DISPLAY_STYLE_INT);
 
     tick += 1000;
 
@@ -430,23 +429,23 @@ void test_fsm_sensor(void)
 
    ((void *)0)
 
-   ), (UNITY_UINT)(208), UNITY_DISPLAY_STYLE_INT);
+   ), (UNITY_UINT)(209), UNITY_DISPLAY_STYLE_INT);
 
 
 
     readData((fsm_t*)(&fsm_sensor));
 
-    do {if ((fsm_sensor.data.hum == 33)) {} else {UnityFail( ((" Expression Evaluated To FALSE")), (UNITY_UINT)((UNITY_UINT)(211)));}} while(0);
+    do {if ((fsm_sensor.data.hum == 33)) {} else {UnityFail( ((" Expression Evaluated To FALSE")), (UNITY_UINT)((UNITY_UINT)(212)));}} while(0);
 
     sendData((fsm_t*)(&fsm_sensor));
 
-    UnityAssertEqualNumber((UNITY_INT)((SEND_DATA)), (UNITY_INT)((( (*(&flags))&(SEND_DATA) ))), (
+    UnityAssertEqualNumber((UNITY_INT)((SEND_DATA)), (UNITY_INT)((( (*(&flags_test))&(SEND_DATA) ))), (
 
    ((void *)0)
 
-   ), (UNITY_UINT)(213), UNITY_DISPLAY_STYLE_INT);
+   ), (UNITY_UINT)(214), UNITY_DISPLAY_STYLE_INT);
 
-    do {if ((tick == fsm_sensor.data.tickCounter)) {} else {UnityFail( ((" Expression Evaluated To FALSE")), (UNITY_UINT)((UNITY_UINT)(214)));}} while(0);
+    do {if ((tick == fsm_sensor.data.tickCounter)) {} else {UnityFail( ((" Expression Evaluated To FALSE")), (UNITY_UINT)((UNITY_UINT)(215)));}} while(0);
 
 
 
@@ -464,27 +463,27 @@ void test_fsm_event(void)
 
 
 
-    flags = 0;
+    flags_test =0;
 
 
 
-    ( *(&flags) |= (MQTT_NEWDATA) );
+    ( *(&flags_test) |= (MQTT_NEWDATA) );
 
     UnityAssertEqualNumber((UNITY_INT)((MQTT_NEWDATA)), (UNITY_INT)((checkFlagInData( (fsm_t*)(&fsm_event) ))), (
 
    ((void *)0)
 
-   ), (UNITY_UINT)(226), UNITY_DISPLAY_STYLE_INT);
+   ), (UNITY_UINT)(227), UNITY_DISPLAY_STYLE_INT);
 
 
 
-    ( *(&flags) |= (SEND_DATA) );
+    ( *(&flags_test) |= (SEND_DATA) );
 
     UnityAssertEqualNumber((UNITY_INT)((SEND_DATA)), (UNITY_INT)((checkFlagOutData( (fsm_t*)(&fsm_event) ))), (
 
    ((void *)0)
 
-   ), (UNITY_UINT)(229), UNITY_DISPLAY_STYLE_INT);
+   ), (UNITY_UINT)(230), UNITY_DISPLAY_STYLE_INT);
 
 
 
@@ -498,11 +497,11 @@ void test_fsm_event(void)
 
     processData( (fsm_t*)(&fsm_event) );
 
-    UnityAssertEqualNumber((UNITY_INT)((LED_ON)), (UNITY_INT)((( (*(&flags))&(LED_ON) ))), (
+    UnityAssertEqualNumber((UNITY_INT)((LED_ON)), (UNITY_INT)((( (*(&flags_test))&(LED_ON) ))), (
 
    ((void *)0)
 
-   ), (UNITY_UINT)(236), UNITY_DISPLAY_STYLE_INT);
+   ), (UNITY_UINT)(237), UNITY_DISPLAY_STYLE_INT);
 
 
 
@@ -510,11 +509,11 @@ void test_fsm_event(void)
 
     processData( (fsm_t*)(&fsm_event) );
 
-    UnityAssertEqualNumber((UNITY_INT)((LED_OFF)), (UNITY_INT)((( (*(&flags))&(LED_OFF) ))), (
+    UnityAssertEqualNumber((UNITY_INT)((LED_OFF)), (UNITY_INT)((( (*(&flags_test))&(LED_OFF) ))), (
 
    ((void *)0)
 
-   ), (UNITY_UINT)(240), UNITY_DISPLAY_STYLE_INT);
+   ), (UNITY_UINT)(241), UNITY_DISPLAY_STYLE_INT);
 
 
 
@@ -524,11 +523,11 @@ void test_fsm_event(void)
 
     processData( (fsm_t*)(&fsm_event) );
 
-    UnityAssertEqualNumber((UNITY_INT)((ALARM_ON)), (UNITY_INT)((( (*(&flags))&(ALARM_ON) ))), (
+    UnityAssertEqualNumber((UNITY_INT)((ALARM_ON)), (UNITY_INT)((( (*(&flags_test))&(ALARM_ON) ))), (
 
    ((void *)0)
 
-   ), (UNITY_UINT)(245), UNITY_DISPLAY_STYLE_INT);
+   ), (UNITY_UINT)(246), UNITY_DISPLAY_STYLE_INT);
 
 
 
@@ -536,11 +535,11 @@ void test_fsm_event(void)
 
     processData( (fsm_t*)(&fsm_event) );
 
-    UnityAssertEqualNumber((UNITY_INT)((ALARM_OFF)), (UNITY_INT)((( (*(&flags))&(ALARM_OFF) ))), (
+    UnityAssertEqualNumber((UNITY_INT)((ALARM_OFF)), (UNITY_INT)((( (*(&flags_test))&(ALARM_OFF) ))), (
 
    ((void *)0)
 
-   ), (UNITY_UINT)(249), UNITY_DISPLAY_STYLE_INT);
+   ), (UNITY_UINT)(250), UNITY_DISPLAY_STYLE_INT);
 
 
 
@@ -552,17 +551,227 @@ void test_fsm_event(void)
 
     processData( (fsm_t*)(&fsm_event) );
 
-    UnityAssertEqualNumber((UNITY_INT)((1)), (UNITY_INT)((( (*(&flags))&(LED_COLOR) ))), (
+    UnityAssertEqualNumber((UNITY_INT)((LED_COLOR)), (UNITY_INT)((( (*(&flags_test))&(LED_COLOR) ))), (
 
    ((void *)0)
 
-   ), (UNITY_UINT)(255), UNITY_DISPLAY_STYLE_INT);
+   ), (UNITY_UINT)(256), UNITY_DISPLAY_STYLE_INT);
 
-    do {if ((fsm_led.data.bColor == 0x54)) {} else {UnityFail( ((" Expression Evaluated To FALSE")), (UNITY_UINT)((UNITY_UINT)(256)));}} while(0);
+    do {if ((fsm_led.data.bColor == 0x55)) {} else {UnityFail( ((" Expression Evaluated To FALSE")), (UNITY_UINT)((UNITY_UINT)(257)));}} while(0);
 
 
 
 }
+
+
+
+
+
+
+
+void test_fsm_control(void)
+
+{
+
+    flags_test =0;
+
+    gpioVal = 0;
+
+    tick = 0;
+
+    UnityAssertEqualNumber((UNITY_INT)((0)), (UNITY_INT)((checkConnected( (fsm_t*)(&fsm_control)))), (
+
+   ((void *)0)
+
+   ), (UNITY_UINT)(268), UNITY_DISPLAY_STYLE_INT);
+
+    UnityAssertEqualNumber((UNITY_INT)((1)), (UNITY_INT)((checkNotConnected( (fsm_t*)(&fsm_control)))), (
+
+   ((void *)0)
+
+   ), (UNITY_UINT)(269), UNITY_DISPLAY_STYLE_INT);
+
+    UnityAssertEqualNumber((UNITY_INT)((1)), (UNITY_INT)((checkNotConfigured( (fsm_t*)(&fsm_control)))), (
+
+   ((void *)0)
+
+   ), (UNITY_UINT)(270), UNITY_DISPLAY_STYLE_INT);
+
+    UnityAssertEqualNumber((UNITY_INT)((0)), (UNITY_INT)((checkButton( (fsm_t*)(&fsm_control)))), (
+
+   ((void *)0)
+
+   ), (UNITY_UINT)(271), UNITY_DISPLAY_STYLE_INT);
+
+    UnityAssertEqualNumber((UNITY_INT)((0)), (UNITY_INT)((checkTimerHigher( (fsm_t*)(&fsm_control)))), (
+
+   ((void *)0)
+
+   ), (UNITY_UINT)(272), UNITY_DISPLAY_STYLE_INT);
+
+    UnityAssertEqualNumber((UNITY_INT)((1)), (UNITY_INT)((checkTimerLower( (fsm_t*)(&fsm_control)))), (
+
+   ((void *)0)
+
+   ), (UNITY_UINT)(273), UNITY_DISPLAY_STYLE_INT);
+
+    UnityAssertEqualNumber((UNITY_INT)((1)), (UNITY_INT)((checkNotButtonTimerLower( (fsm_t*)(&fsm_control)))), (
+
+   ((void *)0)
+
+   ), (UNITY_UINT)(274), UNITY_DISPLAY_STYLE_INT);
+
+
+
+    flags_test =0xFFFFFFFF;
+
+    gpioVal = 1;
+
+    tick = 10;
+
+    UnityAssertEqualNumber((UNITY_INT)((1)), (UNITY_INT)((checkConnected( (fsm_t*)(&fsm_control)))), (
+
+   ((void *)0)
+
+   ), (UNITY_UINT)(279), UNITY_DISPLAY_STYLE_INT);
+
+    UnityAssertEqualNumber((UNITY_INT)((0)), (UNITY_INT)((checkNotConnected( (fsm_t*)(&fsm_control)))), (
+
+   ((void *)0)
+
+   ), (UNITY_UINT)(280), UNITY_DISPLAY_STYLE_INT);
+
+    UnityAssertEqualNumber((UNITY_INT)((0)), (UNITY_INT)((checkNotConfigured( (fsm_t*)(&fsm_control)))), (
+
+   ((void *)0)
+
+   ), (UNITY_UINT)(281), UNITY_DISPLAY_STYLE_INT);
+
+    UnityAssertEqualNumber((UNITY_INT)((1)), (UNITY_INT)((checkButton( (fsm_t*)(&fsm_control)))), (
+
+   ((void *)0)
+
+   ), (UNITY_UINT)(282), UNITY_DISPLAY_STYLE_INT);
+
+    UnityAssertEqualNumber((UNITY_INT)((1)), (UNITY_INT)((checkTimerHigher( (fsm_t*)(&fsm_control)))), (
+
+   ((void *)0)
+
+   ), (UNITY_UINT)(283), UNITY_DISPLAY_STYLE_INT);
+
+    UnityAssertEqualNumber((UNITY_INT)((0)), (UNITY_INT)((checkTimerLower( (fsm_t*)(&fsm_control)))), (
+
+   ((void *)0)
+
+   ), (UNITY_UINT)(284), UNITY_DISPLAY_STYLE_INT);
+
+    UnityAssertEqualNumber((UNITY_INT)((0)), (UNITY_INT)((checkNotButtonTimerLower( (fsm_t*)(&fsm_control)))), (
+
+   ((void *)0)
+
+   ), (UNITY_UINT)(285), UNITY_DISPLAY_STYLE_INT);
+
+
+
+}
+
+
+
+
+
+void test_fsm_sensor_1(void)
+
+{
+
+    flags_test = 0;
+
+    fsm_sensor.data.flags = &flags_test;
+
+
+
+
+
+    tick = 0;
+
+
+
+    fsm_init((fsm_t*)(&fsm_sensor), sensor_fsm);
+
+    fsm_fire((fsm_t*)(&fsm_sensor));
+
+
+
+
+
+    do {if ((fsm_sensor.fsm.current_state == IDLE)) {} else {UnityFail( ((" Expression Evaluated To FALSE")), (UNITY_UINT)((UNITY_UINT)(302)));}} while(0);
+
+
+
+    ( *(&flags_test) |= (START) );
+
+
+
+    fsm_fire((fsm_t*)(&fsm_sensor));
+
+    do {if ((fsm_sensor.fsm.current_state == WAIT)) {} else {UnityFail( ((" Expression Evaluated To FALSE")), (UNITY_UINT)((UNITY_UINT)(307)));}} while(0);
+
+
+
+
+
+    fsm_fire((fsm_t*)(&fsm_sensor));
+
+    do {if ((fsm_sensor.fsm.current_state == WAIT)) {} else {UnityFail( ((" Expression Evaluated To FALSE")), (UNITY_UINT)((UNITY_UINT)(311)));}} while(0);
+
+
+
+    tick += 1000;
+
+    fsm_fire((fsm_t*)(&fsm_sensor));
+
+    do {if ((fsm_sensor.fsm.current_state == READ)) {} else {UnityFail( ((" Expression Evaluated To FALSE")), (UNITY_UINT)((UNITY_UINT)(315)));}} while(0);
+
+    fsm_fire((fsm_t*)(&fsm_sensor));
+
+    do {if ((fsm_sensor.fsm.current_state == WAIT)) {} else {UnityFail( ((" Expression Evaluated To FALSE")), (UNITY_UINT)((UNITY_UINT)(317)));}} while(0);
+
+    UnityAssertEqualNumber((UNITY_INT)((SEND_DATA)), (UNITY_INT)((( (*(&flags_test))&(SEND_DATA) ))), (
+
+   ((void *)0)
+
+   ), (UNITY_UINT)(318), UNITY_DISPLAY_STYLE_INT);
+
+
+
+    ( *(&flags_test) &= ~(START) );
+
+    fsm_fire((fsm_t*)(&fsm_sensor));
+
+    do {if ((fsm_sensor.fsm.current_state == IDLE)) {} else {UnityFail( ((" Expression Evaluated To FALSE")), (UNITY_UINT)((UNITY_UINT)(322)));}} while(0);
+
+
+
+    fsm_sensor.fsm.current_state = READ;
+
+    fsm_fire((fsm_t*)(&fsm_sensor));
+
+    do {if ((fsm_sensor.fsm.current_state == IDLE)) {} else {UnityFail( ((" Expression Evaluated To FALSE")), (UNITY_UINT)((UNITY_UINT)(326)));}} while(0);
+
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
 
 void setPWM (uint32_t GPIO, uint8_t dutyCycle)
 
