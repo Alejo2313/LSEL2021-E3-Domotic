@@ -42,7 +42,7 @@
 /******************************** Variables ********************************/
 
 enum led_state {
- // IDLE,
+  IDLE_LED,
   WAITING,
   LIGHT_ON
 };
@@ -56,13 +56,13 @@ enum sensor_state {
 
 
 enum event_state {
-//  IDLE,
+  IDLE_EVENT,
   COMM
 };
 
 
 enum control_state {
-//  IDLE,
+  IDLE_CONTROL,
   CONNECT,
   BTN_IDLE,
   CONF_MODE,

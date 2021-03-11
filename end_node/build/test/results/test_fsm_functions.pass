@@ -27,11 +27,19 @@
   :line: 290
   :message: ''
   :unity_test_time: 0
+- :test: test_fsm_led1
+  :line: 332
+  :message: ''
+  :unity_test_time: 0
+- :test: test_fsm_sensor1
+  :line: 363
+  :message: ''
+  :unity_test_time: 0
 :failures: []
 :ignores: []
 :counts:
-  :total: 6
-  :passed: 6
+  :total: 8
+  :passed: 8
   :failed: 0
   :ignored: 0
 :stdout:
@@ -44,4 +52,7 @@
 - 'setting PWM 0 on GPIO 2 '
 - 'setting PWM 0 on GPIO 5 '
 - 'setting PWM 0 on GPIO 3 '
-:time: 0.031165899999905378
+- 'setting PWM 50 on GPIO 2 '
+- 'setting PWM 50 on GPIO 5 '
+- 'setting PWM 50 on GPIO 3 '
+:time: 0.018250500000249303

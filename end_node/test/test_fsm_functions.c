@@ -329,7 +329,77 @@ void test_fsm_sensor_1(void)
 }
 
 
+void test_fsm_led1(void)
+{
+    flags_test = 0;
+    fsm_led.data.flags = &flags_test;
 
+   
+    tick = 0;
+
+    fsm_init((fsm_t*)(&fsm_led), led_fsm);
+    fsm_fire((fsm_t*)(&fsm_led));
+
+
+    TEST_ASSERT(fsm_led.fsm.current_state == IDLE);
+
+    SET_FLAGS(&flags_test, START);
+
+    fsm_fire((fsm_t*)(&fsm_led));
+    TEST_ASSERT(fsm_led.fsm.current_state == WAITING);
+
+
+    fsm_fire((fsm_t*)(&fsm_led));
+    TEST_ASSERT(fsm_led.fsm.current_state == WAITING);
+
+    SET_FLAGS(&flags_test, LED_ON);
+
+    fsm_fire((fsm_t*)(&fsm_led));
+    TEST_ASSERT(fsm_led.fsm.current_state == LIGHT_ON);
+
+}
+
+
+void test_fsm_sensor1(void)
+{
+    flags_test = 0;
+    fsm_event.data.flags = &flags_test;
+
+   
+    tick = 0;
+
+    fsm_init((fsm_t*)(&fsm_event), eventos_fsm);
+    fsm_fire((fsm_t*)(&fsm_event));
+
+
+    TEST_ASSERT(fsm_event.fsm.current_state == IDLE);
+
+    SET_FLAGS(&flags_test, START);
+
+    fsm_fire((fsm_t*)(&fsm_event));
+    TEST_ASSERT(fsm_event.fsm.current_state == COMM);
+
+    mess_size = sprintf(mess, "65353");         //0x00FF49
+    topic_ind = COLOR_LED;
+    SET_FLAGS(&flags_test, MQTT_NEWDATA);
+
+    fsm_fire((fsm_t*)(&fsm_event));
+    TEST_ASSERT(fsm_event.fsm.current_state == COMM);
+    TEST_ASSERT(!IS_FLAG(&flags_test, MQTT_NEWDATA));
+    TEST_ASSERT(fsm_event.data.colorLEDData->bColor == 0x49);
+    TEST_ASSERT(fsm_event.data.colorLEDData->gColor == 0xFF);
+    TEST_ASSERT(fsm_event.data.colorLEDData->rColor == 0x00);
+
+    mess_size = sprintf(mess, "0");         
+    topic_ind = TURN_LED;
+    SET_FLAGS(&flags_test, MQTT_NEWDATA);
+
+    fsm_fire((fsm_t*)(&fsm_event));
+    TEST_ASSERT(fsm_event.fsm.current_state == COMM);
+    TEST_ASSERT(!IS_FLAG(&flags_test, MQTT_NEWDATA));
+    TEST_ASSERT(IS_FLAG(&flags_test, LED_OFF));
+
+}
 
 
 void setPWM (uint32_t GPIO, uint8_t dutyCycle)

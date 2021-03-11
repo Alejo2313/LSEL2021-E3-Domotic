@@ -201,7 +201,7 @@ typedef struct
  */
 typedef struct 
 {
-    fsm_t* fsm;
+    fsm_t fsm;
     event_data_t data;
     event_interface_t interface;
 

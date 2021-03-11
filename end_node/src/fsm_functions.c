@@ -304,6 +304,8 @@ void processData(fsm_t* this)
     } 
     else
     {
+      CLEAR_FLAGS(fsm->data.flags, LED_ON);
+      CLEAR_FLAGS(fsm->data.flags, LED_COLOR);
       SET_FLAGS(fsm->data.flags, LED_OFF);
     }
     break;
@@ -338,7 +340,7 @@ void processData(fsm_t* this)
 }
 
 /**
- * @brief sends the sensor's values collected previously to the gateway
+ * @brief sends the sensor's values previously collected to the gateway
  * 
  * @param this fsm structure used
  */

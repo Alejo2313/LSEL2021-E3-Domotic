@@ -767,7 +767,147 @@ void test_fsm_sensor_1(void)
 
 
 
+void test_fsm_led1(void)
 
+{
+
+    flags_test = 0;
+
+    fsm_led.data.flags = &flags_test;
+
+
+
+
+
+    tick = 0;
+
+
+
+    fsm_init((fsm_t*)(&fsm_led), led_fsm);
+
+    fsm_fire((fsm_t*)(&fsm_led));
+
+
+
+
+
+    do {if ((fsm_led.fsm.current_state == IDLE)) {} else {UnityFail( ((" Expression Evaluated To FALSE")), (UNITY_UINT)((UNITY_UINT)(344)));}} while(0);
+
+
+
+    ( *(&flags_test) |= (START) );
+
+
+
+    fsm_fire((fsm_t*)(&fsm_led));
+
+    do {if ((fsm_led.fsm.current_state == WAITING)) {} else {UnityFail( ((" Expression Evaluated To FALSE")), (UNITY_UINT)((UNITY_UINT)(349)));}} while(0);
+
+
+
+
+
+    fsm_fire((fsm_t*)(&fsm_led));
+
+    do {if ((fsm_led.fsm.current_state == WAITING)) {} else {UnityFail( ((" Expression Evaluated To FALSE")), (UNITY_UINT)((UNITY_UINT)(353)));}} while(0);
+
+
+
+    ( *(&flags_test) |= (LED_ON) );
+
+
+
+    fsm_fire((fsm_t*)(&fsm_led));
+
+    do {if ((fsm_led.fsm.current_state == LIGHT_ON)) {} else {UnityFail( ((" Expression Evaluated To FALSE")), (UNITY_UINT)((UNITY_UINT)(358)));}} while(0);
+
+
+
+}
+
+
+
+
+
+void test_fsm_sensor1(void)
+
+{
+
+    flags_test = 0;
+
+    fsm_event.data.flags = &flags_test;
+
+
+
+
+
+    tick = 0;
+
+
+
+    fsm_init((fsm_t*)(&fsm_event), eventos_fsm);
+
+    fsm_fire((fsm_t*)(&fsm_event));
+
+
+
+
+
+    do {if ((fsm_event.fsm.current_state == IDLE)) {} else {UnityFail( ((" Expression Evaluated To FALSE")), (UNITY_UINT)((UNITY_UINT)(375)));}} while(0);
+
+
+
+    ( *(&flags_test) |= (START) );
+
+
+
+    fsm_fire((fsm_t*)(&fsm_event));
+
+    do {if ((fsm_event.fsm.current_state == COMM)) {} else {UnityFail( ((" Expression Evaluated To FALSE")), (UNITY_UINT)((UNITY_UINT)(380)));}} while(0);
+
+
+
+    mess_size = sprintf(mess, "65353");
+
+    topic_ind = COLOR_LED;
+
+    ( *(&flags_test) |= (MQTT_NEWDATA) );
+
+
+
+    fsm_fire((fsm_t*)(&fsm_event));
+
+    do {if ((fsm_event.fsm.current_state == COMM)) {} else {UnityFail( ((" Expression Evaluated To FALSE")), (UNITY_UINT)((UNITY_UINT)(387)));}} while(0);
+
+    do {if ((!( (*(&flags_test))&(MQTT_NEWDATA) ))) {} else {UnityFail( ((" Expression Evaluated To FALSE")), (UNITY_UINT)((UNITY_UINT)(388)));}} while(0);
+
+    do {if ((fsm_event.data.colorLEDData->bColor == 0x49)) {} else {UnityFail( ((" Expression Evaluated To FALSE")), (UNITY_UINT)((UNITY_UINT)(389)));}} while(0);
+
+    do {if ((fsm_event.data.colorLEDData->gColor == 0xFF)) {} else {UnityFail( ((" Expression Evaluated To FALSE")), (UNITY_UINT)((UNITY_UINT)(390)));}} while(0);
+
+    do {if ((fsm_event.data.colorLEDData->rColor == 0x00)) {} else {UnityFail( ((" Expression Evaluated To FALSE")), (UNITY_UINT)((UNITY_UINT)(391)));}} while(0);
+
+
+
+    mess_size = sprintf(mess, "0");
+
+    topic_ind = TURN_LED;
+
+    ( *(&flags_test) |= (MQTT_NEWDATA) );
+
+
+
+    fsm_fire((fsm_t*)(&fsm_event));
+
+    do {if ((fsm_event.fsm.current_state == COMM)) {} else {UnityFail( ((" Expression Evaluated To FALSE")), (UNITY_UINT)((UNITY_UINT)(398)));}} while(0);
+
+    do {if ((!( (*(&flags_test))&(MQTT_NEWDATA) ))) {} else {UnityFail( ((" Expression Evaluated To FALSE")), (UNITY_UINT)((UNITY_UINT)(399)));}} while(0);
+
+    do {if ((( (*(&flags_test))&(LED_OFF) ))) {} else {UnityFail( ((" Expression Evaluated To FALSE")), (UNITY_UINT)((UNITY_UINT)(400)));}} while(0);
+
+
+
+}
 
 
 
