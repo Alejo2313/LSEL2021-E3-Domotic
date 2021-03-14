@@ -1,0 +1,6 @@
+from lsel_mqttclient import mqtt_subscriber
+import sys
+sub1=mqtt_subscriber(broker_addr=sys.argv[1], gw_name=sys.argv[2],client_id=sys.argv[3],
+    subscribe_topic=sys.argv[4])
+
+sub1.sub_all_connect()
