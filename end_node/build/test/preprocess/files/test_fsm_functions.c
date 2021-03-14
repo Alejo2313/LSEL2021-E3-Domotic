@@ -907,6 +907,50 @@ void test_fsm_sensor1(void)
 
 
 
+    mess_size = sprintf(mess, "1");
+
+    topic_ind = TURN_ALARM;
+
+    ( *(&flags_test) |= (MQTT_NEWDATA) );
+
+
+
+    fsm_fire((fsm_t*)(&fsm_event));
+
+    do {if ((fsm_event.fsm.current_state == COMM)) {} else {UnityFail( ((" Expression Evaluated To FALSE")), (UNITY_UINT)((UNITY_UINT)(407)));}} while(0);
+
+    do {if ((!( (*(&flags_test))&(MQTT_NEWDATA) ))) {} else {UnityFail( ((" Expression Evaluated To FALSE")), (UNITY_UINT)((UNITY_UINT)(408)));}} while(0);
+
+    do {if ((( (*(&flags_test))&(ALARM_ON) ))) {} else {UnityFail( ((" Expression Evaluated To FALSE")), (UNITY_UINT)((UNITY_UINT)(409)));}} while(0);
+
+
+
+
+
+    ( *(&flags_test) |= (SEND_DATA) );
+
+    fsm_fire((fsm_t*)(&fsm_event));
+
+    do {if ((fsm_event.fsm.current_state == COMM)) {} else {UnityFail( ((" Expression Evaluated To FALSE")), (UNITY_UINT)((UNITY_UINT)(414)));}} while(0);
+
+    do {if ((!( (*(&flags_test))&(SEND_DATA) ))) {} else {UnityFail( ((" Expression Evaluated To FALSE")), (UNITY_UINT)((UNITY_UINT)(415)));}} while(0);
+
+
+
+
+
+    ( *(&flags_test) &= ~(START) );
+
+    fsm_fire((fsm_t*)(&fsm_event));
+
+    do {if ((fsm_event.fsm.current_state == IDLE)) {} else {UnityFail( ((" Expression Evaluated To FALSE")), (UNITY_UINT)((UNITY_UINT)(420)));}} while(0);
+
+
+
+
+
+
+
 }
 
 
@@ -1011,7 +1055,7 @@ void sendData_mqtt(int topicId, const char* data, uint16_t len )
 
 {
 
-    printf("sending %s from %d with %d bytes", data, topicId, len);
+    printf("sending %s from %d with %d bytes\n", data, topicId, len);
 
 }
 

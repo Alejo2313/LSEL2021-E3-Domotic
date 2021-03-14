@@ -399,6 +399,30 @@ void test_fsm_sensor1(void)
     TEST_ASSERT(!IS_FLAG(&flags_test, MQTT_NEWDATA));
     TEST_ASSERT(IS_FLAG(&flags_test, LED_OFF));
 
+    mess_size = sprintf(mess, "1");         
+    topic_ind = TURN_ALARM;
+    SET_FLAGS(&flags_test, MQTT_NEWDATA);
+
+    fsm_fire((fsm_t*)(&fsm_event));
+    TEST_ASSERT(fsm_event.fsm.current_state == COMM);
+    TEST_ASSERT(!IS_FLAG(&flags_test, MQTT_NEWDATA));
+    TEST_ASSERT(IS_FLAG(&flags_test, ALARM_ON));
+
+    
+    SET_FLAGS(&flags_test, SEND_DATA);
+
+    fsm_fire((fsm_t*)(&fsm_event));
+    TEST_ASSERT(fsm_event.fsm.current_state == COMM);
+    TEST_ASSERT(!IS_FLAG(&flags_test, SEND_DATA));
+
+
+    CLEAR_FLAGS(&flags_test, START);
+    
+    fsm_fire((fsm_t*)(&fsm_event));
+    TEST_ASSERT(fsm_event.fsm.current_state == IDLE);
+
+
+
 }
 
 
@@ -451,7 +475,7 @@ int getData_mqtt( char** data, uint16_t* size )
 }                         
 void sendData_mqtt(int topicId, const char* data, uint16_t len )
 {
-    printf("sending %s from %d with %d bytes", data, topicId, len);
+    printf("sending %s from %d with %d bytes\n", data, topicId, len);
 }     
 
 void delayMs(uint16_t ms)

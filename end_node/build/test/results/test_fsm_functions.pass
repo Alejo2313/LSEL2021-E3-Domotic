@@ -55,4 +55,7 @@
 - 'setting PWM 50 on GPIO 2 '
 - 'setting PWM 50 on GPIO 5 '
 - 'setting PWM 50 on GPIO 3 '
-:time: 0.018250500000249303
+- sending 33 from 4 with 2 bytes
+- sending 33 from 5 with 2 bytes
+- sending 33 from 3 with 2 bytes
+:time: 0.016911800000002586
