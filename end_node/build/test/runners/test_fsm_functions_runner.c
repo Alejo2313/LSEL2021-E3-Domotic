@@ -17,7 +17,8 @@ extern void test_fsm_event(void);
 extern void test_fsm_control(void);
 extern void test_fsm_sensor_1(void);
 extern void test_fsm_led1(void);
-extern void test_fsm_sensor1(void);
+extern void test_fsm_event1(void);
+extern void test_fsm_control1(void);
 
 
 /*=======Mock Management=====*/
@@ -89,7 +90,8 @@ int main(void)
   run_test(test_fsm_control, "test_fsm_control", 263);
   run_test(test_fsm_sensor_1, "test_fsm_sensor_1", 290);
   run_test(test_fsm_led1, "test_fsm_led1", 332);
-  run_test(test_fsm_sensor1, "test_fsm_sensor1", 363);
+  run_test(test_fsm_event1, "test_fsm_event1", 363);
+  run_test(test_fsm_control1, "test_fsm_control1", 426);
 
   return UnityEnd();
 }

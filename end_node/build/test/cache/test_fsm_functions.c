@@ -829,7 +829,7 @@ void test_fsm_led1(void)
 
 
 
-void test_fsm_sensor1(void)
+void test_fsm_event1(void)
 
 {
 
@@ -929,11 +929,13 @@ void test_fsm_sensor1(void)
 
     ( *(&flags_test) |= (SEND_DATA) );
 
+
+
     fsm_fire((fsm_t*)(&fsm_event));
 
-    do {if ((fsm_event.fsm.current_state == COMM)) {} else {UnityFail( ((" Expression Evaluated To FALSE")), (UNITY_UINT)((UNITY_UINT)(414)));}} while(0);
+    do {if ((fsm_event.fsm.current_state == COMM)) {} else {UnityFail( ((" Expression Evaluated To FALSE")), (UNITY_UINT)((UNITY_UINT)(415)));}} while(0);
 
-    do {if ((!( (*(&flags_test))&(SEND_DATA) ))) {} else {UnityFail( ((" Expression Evaluated To FALSE")), (UNITY_UINT)((UNITY_UINT)(415)));}} while(0);
+    do {if ((!( (*(&flags_test))&(SEND_DATA) ))) {} else {UnityFail( ((" Expression Evaluated To FALSE")), (UNITY_UINT)((UNITY_UINT)(416)));}} while(0);
 
 
 
@@ -941,19 +943,155 @@ void test_fsm_sensor1(void)
 
     ( *(&flags_test) &= ~(START) );
 
+
+
     fsm_fire((fsm_t*)(&fsm_event));
 
-    do {if ((fsm_event.fsm.current_state == IDLE)) {} else {UnityFail( ((" Expression Evaluated To FALSE")), (UNITY_UINT)((UNITY_UINT)(420)));}} while(0);
-
-
-
-
+    do {if ((fsm_event.fsm.current_state == IDLE)) {} else {UnityFail( ((" Expression Evaluated To FALSE")), (UNITY_UINT)((UNITY_UINT)(422)));}} while(0);
 
 
 
 }
 
 
+
+void test_fsm_control1(void)
+
+{
+
+    flags_test = 0;
+
+    fsm_control.data.flags = &flags_test;
+
+
+
+
+
+    tick = 0;
+
+
+
+    fsm_init((fsm_t*)(&fsm_control), control_fsm);
+
+    fsm_fire((fsm_t*)(&fsm_control));
+
+
+
+
+
+    do {if ((fsm_control.fsm.current_state == CONNECT)) {} else {UnityFail( ((" Expression Evaluated To FALSE")), (UNITY_UINT)((UNITY_UINT)(438)));}} while(0);
+
+
+
+    fsm_fire((fsm_t*)(&fsm_control));
+
+    do {if ((fsm_control.fsm.current_state == WAIT_RETRY)) {} else {UnityFail( ((" Expression Evaluated To FALSE")), (UNITY_UINT)((UNITY_UINT)(441)));}} while(0);
+
+
+
+    fsm_control.data.tickCounter = 20;
+
+
+
+    fsm_fire((fsm_t*)(&fsm_control));
+
+    do {if ((fsm_control.fsm.current_state == CONNECT)) {} else {UnityFail( ((" Expression Evaluated To FALSE")), (UNITY_UINT)((UNITY_UINT)(446)));}} while(0);
+
+
+
+    ( *(&flags_test) |= (MQTT_CONNECTED) );
+
+    ( *(&flags_test) |= (WIFI_CONNECTED) );
+
+
+
+    fsm_fire((fsm_t*)(&fsm_control));
+
+    do {if ((fsm_control.fsm.current_state == IDLE)) {} else {UnityFail( ((" Expression Evaluated To FALSE")), (UNITY_UINT)((UNITY_UINT)(452)));}} while(0);
+
+    do {if ((( (*(&flags_test))&(START) ))) {} else {UnityFail( ((" Expression Evaluated To FALSE")), (UNITY_UINT)((UNITY_UINT)(453)));}} while(0);
+
+
+
+    gpioVal = 1;
+
+    fsm_fire((fsm_t*)(&fsm_control));
+
+    do {if ((fsm_control.fsm.current_state == BTN_IDLE)) {} else {UnityFail( ((" Expression Evaluated To FALSE")), (UNITY_UINT)((UNITY_UINT)(457)));}} while(0);
+
+
+
+    fsm_control.data.tickCounter = 20;
+
+    fsm_fire((fsm_t*)(&fsm_control));
+
+    do {if ((fsm_control.fsm.current_state == CONF_MODE)) {} else {UnityFail( ((" Expression Evaluated To FALSE")), (UNITY_UINT)((UNITY_UINT)(461)));}} while(0);
+
+    do {if ((( (*(&flags_test))&(CONFIGURE) ))) {} else {UnityFail( ((" Expression Evaluated To FALSE")), (UNITY_UINT)((UNITY_UINT)(462)));}} while(0);
+
+
+
+    ( *(&flags_test) &= ~(CONFIGURE) );
+
+    fsm_fire((fsm_t*)(&fsm_control));
+
+    do {if ((fsm_control.fsm.current_state == CONNECT)) {} else {UnityFail( ((" Expression Evaluated To FALSE")), (UNITY_UINT)((UNITY_UINT)(466)));}} while(0);
+
+    do {if ((!( (*(&flags_test))&(START) ))) {} else {UnityFail( ((" Expression Evaluated To FALSE")), (UNITY_UINT)((UNITY_UINT)(467)));}} while(0);
+
+
+
+    ( *(&flags_test) &= ~(MQTT_CONNECTED) );
+
+    ( *(&flags_test) &= ~(WIFI_CONNECTED) );
+
+    fsm_fire((fsm_t*)(&fsm_control));
+
+    do {if ((fsm_control.fsm.current_state == WAIT_RETRY)) {} else {UnityFail( ((" Expression Evaluated To FALSE")), (UNITY_UINT)((UNITY_UINT)(472)));}} while(0);
+
+
+
+    gpioVal = 1;
+
+    fsm_fire((fsm_t*)(&fsm_control));
+
+    do {if ((fsm_control.fsm.current_state == BTN_CONNECT)) {} else {UnityFail( ((" Expression Evaluated To FALSE")), (UNITY_UINT)((UNITY_UINT)(476)));}} while(0);
+
+
+
+    gpioVal = 0;
+
+    fsm_fire((fsm_t*)(&fsm_control));
+
+    do {if ((fsm_control.fsm.current_state == WAIT_RETRY)) {} else {UnityFail( ((" Expression Evaluated To FALSE")), (UNITY_UINT)((UNITY_UINT)(480)));}} while(0);
+
+
+
+    fsm_control.data.tickCounter = 20;
+
+    fsm_fire((fsm_t*)(&fsm_control));
+
+    do {if ((fsm_control.fsm.current_state == CONNECT)) {} else {UnityFail( ((" Expression Evaluated To FALSE")), (UNITY_UINT)((UNITY_UINT)(484)));}} while(0);
+
+
+
+    ( *(&flags_test) |= (MQTT_CONNECTED) );
+
+    ( *(&flags_test) |= (WIFI_CONNECTED) );
+
+
+
+    fsm_fire((fsm_t*)(&fsm_control));
+
+    do {if ((fsm_control.fsm.current_state == IDLE)) {} else {UnityFail( ((" Expression Evaluated To FALSE")), (UNITY_UINT)((UNITY_UINT)(490)));}} while(0);
+
+    do {if ((( (*(&flags_test))&(START) ))) {} else {UnityFail( ((" Expression Evaluated To FALSE")), (UNITY_UINT)((UNITY_UINT)(491)));}} while(0);
+
+
+
+
+
+}
 
 
 

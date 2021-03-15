@@ -360,7 +360,7 @@ void test_fsm_led1(void)
 }
 
 
-void test_fsm_sensor1(void)
+void test_fsm_event1(void)
 {
     flags_test = 0;
     fsm_event.data.flags = &flags_test;
@@ -421,10 +421,77 @@ void test_fsm_sensor1(void)
     fsm_fire((fsm_t*)(&fsm_event));
     TEST_ASSERT(fsm_event.fsm.current_state == IDLE);
 
-
-
 }
 
+void test_fsm_control1(void)
+{
+    flags_test = 0;
+    fsm_control.data.flags = &flags_test;
+
+   
+    tick = 0;
+
+    fsm_init((fsm_t*)(&fsm_control), control_fsm);
+    fsm_fire((fsm_t*)(&fsm_control));
+
+
+    TEST_ASSERT(fsm_control.fsm.current_state == CONNECT);
+
+    fsm_fire((fsm_t*)(&fsm_control));
+    TEST_ASSERT(fsm_control.fsm.current_state == WAIT_RETRY);
+    
+    fsm_control.data.tickCounter = 20;
+
+    fsm_fire((fsm_t*)(&fsm_control));
+    TEST_ASSERT(fsm_control.fsm.current_state == CONNECT);
+
+    SET_FLAGS(&flags_test, MQTT_CONNECTED);
+    SET_FLAGS(&flags_test, WIFI_CONNECTED);
+    
+    fsm_fire((fsm_t*)(&fsm_control));
+    TEST_ASSERT(fsm_control.fsm.current_state == IDLE);
+    TEST_ASSERT(IS_FLAG(&flags_test, START));
+
+    gpioVal = 1;
+    fsm_fire((fsm_t*)(&fsm_control));
+    TEST_ASSERT(fsm_control.fsm.current_state == BTN_IDLE);
+
+    fsm_control.data.tickCounter = 20;
+    fsm_fire((fsm_t*)(&fsm_control));
+    TEST_ASSERT(fsm_control.fsm.current_state == CONF_MODE);
+    TEST_ASSERT(IS_FLAG(&flags_test, CONFIGURE));
+
+    CLEAR_FLAGS(&flags_test, CONFIGURE);
+    fsm_fire((fsm_t*)(&fsm_control));
+    TEST_ASSERT(fsm_control.fsm.current_state == CONNECT);
+    TEST_ASSERT(!IS_FLAG(&flags_test, START));
+
+    CLEAR_FLAGS(&flags_test, MQTT_CONNECTED);
+    CLEAR_FLAGS(&flags_test, WIFI_CONNECTED);
+    fsm_fire((fsm_t*)(&fsm_control));
+    TEST_ASSERT(fsm_control.fsm.current_state == WAIT_RETRY);
+
+    gpioVal = 1;
+    fsm_fire((fsm_t*)(&fsm_control));
+    TEST_ASSERT(fsm_control.fsm.current_state == BTN_CONNECT);
+
+    gpioVal = 0;
+    fsm_fire((fsm_t*)(&fsm_control));
+    TEST_ASSERT(fsm_control.fsm.current_state == WAIT_RETRY);
+
+    fsm_control.data.tickCounter = 20;
+    fsm_fire((fsm_t*)(&fsm_control));
+    TEST_ASSERT(fsm_control.fsm.current_state == CONNECT);
+
+    SET_FLAGS(&flags_test, MQTT_CONNECTED);
+    SET_FLAGS(&flags_test, WIFI_CONNECTED);
+    
+    fsm_fire((fsm_t*)(&fsm_control));
+    TEST_ASSERT(fsm_control.fsm.current_state == IDLE);
+    TEST_ASSERT(IS_FLAG(&flags_test, START));
+   
+    
+}
 
 void setPWM (uint32_t GPIO, uint8_t dutyCycle)
 {

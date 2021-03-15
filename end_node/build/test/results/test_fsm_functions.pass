@@ -31,15 +31,19 @@
   :line: 332
   :message: ''
   :unity_test_time: 0
-- :test: test_fsm_sensor1
+- :test: test_fsm_event1
   :line: 363
+  :message: ''
+  :unity_test_time: 0
+- :test: test_fsm_control1
+  :line: 426
   :message: ''
   :unity_test_time: 0
 :failures: []
 :ignores: []
 :counts:
-  :total: 8
-  :passed: 8
+  :total: 9
+  :passed: 9
   :failed: 0
   :ignored: 0
 :stdout:
@@ -58,4 +62,12 @@
 - sending 33 from 4 with 2 bytes
 - sending 33 from 5 with 2 bytes
 - sending 33 from 3 with 2 bytes
-:time: 0.016911800000002586
+- 'Connecting to MQTT '
+- 'Connecting to WiFi '
+- 'Connecting to MQTT '
+- 'Connecting to WiFi '
+- 'Connecting to MQTT '
+- 'Connecting to WiFi '
+- 'Connecting to MQTT '
+- 'Connecting to WiFi '
+:time: 0.015694100000018807
