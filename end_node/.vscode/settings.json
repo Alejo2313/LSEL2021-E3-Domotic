@@ -1,8 +1,0 @@
-{
-    "files.associations": {
-        "nvs_flash.h": "c",
-        "fsm_functions.h": "c",
-        "interfaces.h": "c",
-        "defines.h": "c"
-    }
-}

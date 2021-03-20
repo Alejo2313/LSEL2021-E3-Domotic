@@ -83,7 +83,8 @@ typedef enum
     COLOR_LED       = 2,
     SENSOR_TEMP     = 3,
     SENSOR_HUM      = 4,
-    SENSOR_LIGHT    = 5
+    SENSOR_LIGHT    = 5,
+    SENSOR_PRESS    = 6
 }topic_index_t;
 
 /******************************** Variables ********************************/
