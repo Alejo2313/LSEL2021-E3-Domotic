@@ -347,14 +347,15 @@ void initGPIO()
     io_conf.intr_type       = GPIO_PIN_INTR_DISABLE;
     io_conf.mode            = GPIO_MODE_OUTPUT;
     io_conf.pin_bit_mask    = GPIO_OUTPUT_MASK;
-    io_conf.pull_down_en    = 0;
-    io_conf.pull_up_en      = 0;
+
 
     gpio_config(&io_conf);
 
     //Init input GPIOs
     io_conf.mode            = GPIO_MODE_INPUT;
     io_conf.pin_bit_mask    = GPIO_INPUT_MASK;
+    io_conf.pull_down_en    = GPIO_PULLDOWN_ENABLE;
+    io_conf.pull_up_en      = 0;
 
     gpio_config(&io_conf);
 }
@@ -474,8 +475,46 @@ int readTemp()
         return 0;
     }
 
-    return (int)(comp_data.temperature*1000);
+    return (int)(comp_data.temperature);
 }
+
+/**
+ * @brief Read pressure
+ * 
+ * @return int pressure 
+ */
+int readPress()
+{
+    uint8_t rslt;
+    static struct bme280_data comp_data;
+
+    rslt = bme280_set_sensor_mode(BME280_FORCED_MODE, &bme280);
+    
+    if (rslt != BME280_OK)
+    {
+    #ifdef DEBUG
+        ESP_LOGI(TAG, "Failed to set sensor mode (code %+d).", rslt);
+    #endif // DEBUG        
+       
+        return 0;
+    }
+
+    bme280.delay_us(50000, &(bme280.intf_ptr));
+
+    rslt = bme280_get_sensor_data(BME280_PRESS, &comp_data, &bme280);
+
+    if (rslt != BME280_OK)
+    {
+    #ifdef DEBUG
+        ESP_LOGI(TAG, "Failed to read data (code %+d).", rslt);
+    #endif // DEBUG        
+       
+        return 0;
+    }
+
+    return (int)(comp_data.pressure);
+}
+
 
 /**
  * @brief Delay milliseconds
@@ -494,7 +533,7 @@ void delayMs(uint32_t ms)
  */
 uint64_t getTickCount()
 {
-    return (uint64_t)(xTaskGetTickCount()/portTICK_PERIOD_MS );
+    return (uint64_t)(xTaskGetTickCount()*portTICK_PERIOD_MS );
 }
 
 /**
@@ -526,4 +565,14 @@ void setGPIO(uint32_t GPIO)
 int readGPIO(uint32_t GPIO)
 {
     return gpio_get_level(GPIO);
+}
+
+void enterConfigMode(void)
+{
+
+}
+
+int readLight()
+{
+    return 33;
 }

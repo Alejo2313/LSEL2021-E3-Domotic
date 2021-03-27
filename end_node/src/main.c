@@ -30,6 +30,7 @@
 #include "wifi_conn.h"
 #include "defines.h"
 #include "platform.h"
+
 /******************************** Defines **********************************/
 
 
@@ -39,14 +40,111 @@
 
 
 /******************************** Variables ********************************/
+static const char *TAG = "Main";
+
+char wifi_ssid[32];
+char wifi_password[64];
+char mqtt_broker_url[64];
+
+
+fsm_sensor_t fsm_sensor = 
+{
+    .data = 
+    {
+        .flags          = &flags,
+        .hum            = 0,
+        .light          = 0,
+        .temp           = 0,
+        .tickCounter    = 0
+    },
+    .interface = 
+    {
+        .getTickCount   = getTickCount,
+        .readHum        = readHum,
+        .readLight      = readPress,
+        .readTemp       = readTemp
+    }
+    
+};
+
+fsm_led_t fsm_led = 
+{
+ 
+    .data = 
+    {
+        .flags = &flags,
+
+        .alarmPin = ALARM_PIN,
+        
+        .rPin     = LEDR_GPIO,
+        .gPin     = LEDG_GPIO,
+        .bPin     = LEDB_GPIO,
+
+        .rColor   = 0,
+        .gColor   = 0,
+        .bColor   = 0,
+    },
+    .interface = 
+    {
+        .pwmSet     = setPWM,
+        .resetGPIO  = resetGPIO,
+        .setGPIO    = setGPIO,
+    }
+    
+};
+
+fsm_event_t fsm_event = 
+{
+
+    .data = 
+    {
+        .colorLEDData = &(fsm_led.data),
+        .flags =&flags,
+        .sensorData = &(fsm_sensor.data),
+    },
+    .interface = 
+    {
+        .delayMs = delayMs,
+        .getData = getIncomeData,
+        .sendData = (void*)topic_publish,
+    }
+};
+
+
+fsm_control_t fsm_control = 
+{
+
+    .data =
+    {
+        .btnPin         = BTN_PIN,
+        .flags          = &flags,
+        .tickCounter    = 0
+    },
+    .interface =
+    {
+        .enterConfigMode = enterConfigMode,
+        .getTickCount    = getTickCount,
+        .mqttConnect     = mqtt_start,
+        .readGPIO        = readGPIO,
+        .wifiConnect     = wifi_init_sta,
+
+        .delay           = delayMs,
+        .serverStart     = start_webserver,
+        .serverStop      = stop_webserver,
+        
+        .subscribe       = topic_subscribe
+    
+    }
+};
 
 
 
 /******************************** Prototypes *******************************/
 
-static char* TAG = "MAIN:"; //<! Trace header
+//static char* TAG = "MAIN:"; //<! Trace header
 
 /******************************** Functions ********************************/
+
 
 
 
@@ -57,17 +155,38 @@ void app_main(void)
     ESP_LOGI(TAG, "[APP] Free memory: %d bytes", esp_get_free_heap_size());
     ESP_LOGI(TAG, "[APP] IDF version: %s", esp_get_idf_version()); 
 
-//    configPWM();
+
+    strcpy(wifi_ssid, DEFAULT_SSID);
+    strcpy(wifi_password, DEFAULT_PASSWORD);
+    strcpy(mqtt_broker_url, DEFAULT_BROKER);
+
+    nvs_flash_init();
+    ESP_ERROR_CHECK(esp_event_loop_create_default());
+    esp_netif_init();
+    esp_netif_create_default_wifi_sta();
+    esp_netif_create_default_wifi_ap();
+
     sensorInit();
-//    uint8_t duty = 30;
+    configPWM();
+
+    fsm_init((fsm_t*)(&fsm_event), eventos_fsm);
+    fsm_init((fsm_t*)(&fsm_led), led_fsm);
+    fsm_init((fsm_t*)(&fsm_control), control_fsm);
+
+   fsm_init((fsm_t*)(&fsm_sensor), sensor_fsm);
+    
+    
     while (1)
     {
-        printf("temp %d, hum %d\n", readTemp(),readHum());
-  /*      setPWM(LEDR_GPIO, duty);
-        setPWM(LEDG_GPIO, duty);
-        setPWM(LEDB_GPIO, duty);*/
+ 
+        
+        fsm_fire((fsm_t*)(&fsm_control));
+        fsm_fire((fsm_t*)(&fsm_event));
+        fsm_fire((fsm_t*)(&fsm_led));
+       fsm_fire((fsm_t*)(&fsm_sensor));
 
-        vTaskDelay(500 / portTICK_PERIOD_MS);
+   //     printf("stateC %d StateE %d stateL %d stateS %d tick %d flags %X\n", fsm_control.fsm.current_state , fsm_event.fsm.current_state, fsm_led.fsm.current_state,fsm_sensor.fsm.current_state ,fsm_control.interface.readGPIO(BTN_PIN), flags);
+        vTaskDelay(100 / portTICK_PERIOD_MS);
     }
     
 }

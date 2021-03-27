@@ -89,7 +89,16 @@ typedef struct
 
     int  (*readGPIO)(uint32_t btnPin);      //<! Read GPIO state
     void (*wifiConnect)();                  //<! Connect to WiFi
+    void (*wifiDisconnect)();
+
+    void (*serverStart)();
+    void (*serverStop)();
+
+    void (*delay)(uint32_t ms);
+    
     void (*mqttConnect)();                  //<! Connect to MQTT
+    void (*mqttStop)();
+    void (*subscribe)( const char* topic, uint8_t topicIndex );
 
     void (*enterConfigMode)();              //<! Enter in Staton Mode
     uint64_t (*getTickCount)();             //<! Get tickcount value
@@ -177,7 +186,7 @@ typedef struct
 
     int (*getData)( char** data, uint16_t* size );                          //<! Get input data
     void (*sendData)(int topicId, const char* data, uint16_t len );         //<! Send data
-    void (*delayMs)(uint16_t ms);
+    void (*delayMs)(uint32_t ms);
 
 }event_interface_t;
 

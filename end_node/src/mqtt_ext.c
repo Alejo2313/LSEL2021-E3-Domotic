@@ -39,6 +39,12 @@
 
 /******************************** Variables ********************************/
 
+
+char wifi_ssid[32];
+char wifi_password[64];
+char mqtt_broker_url[64];
+
+
 static esp_mqtt_client_handle_t client;             //<! MQTT Client struct
 static char brokerURL[32];                          //<! MQTT broker URL
 
@@ -46,7 +52,6 @@ uint32_t flags;
 static uint32_t* prtFlags = &flags;                 //<! MQTT flags pointer (sintax sugar)
 
 static char topicsSubs[TOPIC_MAX][TOPIC_SIZE];      //<! MQTT topics storage 
-static uint16_t topicCounter = 0;                   //<! MQTT topic  index 
 
 // In buffer data 
 static char inBuffer[MAX_DATA_SIZE];                //<! Input data
@@ -106,7 +111,7 @@ void setBrokerURL(const char* url)
 int getTopicIndex ( const char* topic )
 {
     int cnt = 0;
-    for(cnt = 0; cnt < topicCounter; cnt++)
+    for(cnt = 0; cnt < NTOPICS; cnt++)
     {
         if( strcmp(topic, topicsSubs[cnt]) == 0 )
         {
@@ -190,19 +195,21 @@ static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_
             break;
             
         case MQTT_EVENT_DATA:
-            ESP_LOGI(TAG, "NEW DATA!");
+            
             
             sprintf(tmp, "%.*s", event->topic_len, event->topic);
             msg_id = getTopicIndex(tmp);
 
             if( msg_id == -1 )
             {
-                ESP_LOGI(TAG, "TOPIC NO DEFINED!");
+                ESP_LOGI(TAG, "TOPIC NO DEFINED!tmp %s", tmp);
                 break;
             }
 
+            
             memset(inBuffer,0, MAX_DATA_SIZE);
-            memcpy(inBuffer, event->data, event->data_len);
+            strncpy(inBuffer, event->data, event->data_len);
+            ESP_LOGI(TAG, "NEW DATA! id %d data %s len %d",msg_id, inBuffer, event->data_len);
             inDataSize = event->data_len;
             inTopicIndex = msg_id;
 
@@ -228,7 +235,7 @@ void mqtt_start(void)
 {
  
     esp_mqtt_client_config_t mqtt_cfg = {
-        .uri = CONFIG_BROKER_URL,
+        .uri = mqtt_broker_url,
     };
 
     ESP_LOGI(TAG, "CONFIG MQTT!");
@@ -237,4 +244,9 @@ void mqtt_start(void)
     esp_mqtt_client_start(client);
     ESP_LOGI(TAG, "CONFIGURED!");
 
+}
+
+void mqtt_stop(void)
+{
+    esp_mqtt_client_stop(client);
 }

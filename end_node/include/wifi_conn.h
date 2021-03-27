@@ -35,9 +35,15 @@
 
 /******************************** Defines **********************************/
 
-#define MAXIMUM_RETRY       20      //<! Max number of connection retries
+#define MAXIMUM_RETRY       3      //<! Max number of connection retries
 #define WIFI_CONNECTED_BIT  BIT0    //<! WiFi connecter flag
 #define WIFI_FAIL_BIT       BIT1    //<! WiFi fail flag
+
+
+#define EXAMPLE_ESP_WIFI_SSID      "ESP32_TEST"
+#define EXAMPLE_ESP_WIFI_PASS      "TEST1234"
+#define EXAMPLE_ESP_WIFI_CHANNEL   1
+#define EXAMPLE_MAX_STA_CONN       10
 
 /******************************** Types   **********************************/
 
@@ -52,6 +58,8 @@
  * 
  */
 void wifi_init_sta(void);
+
+void wifi_init_softap(void);
 
 /**
  * @brief Set the Wifi Credentials (FUTURE USE)

@@ -44,11 +44,48 @@
 #define SET_FLAGS(ptrFlags, flag)   ( *(ptrFlags) |= (flag) )
 #define IS_FLAG(ptrFlags, flag) ( (*(ptrFlags))&(flag) )
 
-
-#define CONFIG_BROKER_URL    "mqtt://192.168.1.142:1883"
+/*
+#define CONFIG_BROKER_URL    "mqtt://51.103.29.76:1883"
 #define SSID     "test"
-#define PASSWORD "test"
+#define PASSWORD "test12345"
+*/
 #define NTOPICS    6
+
+
+extern char wifi_ssid[32];
+extern char wifi_password[64];
+extern char mqtt_broker_url[64];
+
+#define DEFAULT_SSID        "test"
+#define DEFAULT_PASSWORD    "test12345"
+#define DEFAULT_BROKER      "mqtt://51.103.29.76:1883"
+
+
+#define DEVICE_ID       "ABCD"
+#define BASE_TOPIC      "/HOME/"
+
+#define TYPE_INT            "-I"
+#define TYPE_STRING         "-D"
+#define TYPE_DOUBLE         "-S"
+
+#define TYPE_TURN_LED        "-0" 
+#define TYPE_TURN_ALARM      "-1" 
+#define TYPE_COLOR_LED       "-2" 
+#define TYPE_SENSOR_TEMP     "-3" 
+#define TYPE_SENSOR_HUM      "-4"
+#define TYPE_SENSOR_LIGHT    "-5"  
+
+#define TYPE_SENSOR          "-I"
+#define TYPE_ACTUATOR        "-O"
+
+#define TURN_LED_TOPIC          BASE_TOPIC  DEVICE_ID    TYPE_INT   TYPE_TURN_LED     TYPE_ACTUATOR
+#define TURN_ALARM_TOPIC        BASE_TOPIC  DEVICE_ID    TYPE_INT   TYPE_TURN_ALARM   TYPE_ACTUATOR 
+#define COLOR_LED_TOPIC         BASE_TOPIC  DEVICE_ID    TYPE_INT   TYPE_COLOR_LED    TYPE_ACTUATOR 
+#define SENSOR_TEMP_TOPIC       BASE_TOPIC  DEVICE_ID    TYPE_INT   TYPE_SENSOR_TEMP  TYPE_SENSOR
+#define SENSOR_HUM_TOPIC        BASE_TOPIC  DEVICE_ID    TYPE_INT   TYPE_SENSOR_HUM   TYPE_SENSOR
+#define SENSOR_LIGHT_TOPIC      BASE_TOPIC  DEVICE_ID    TYPE_INT   TYPE_SENSOR_LIGHT TYPE_SENSOR
+
+#define FLAGS_ALL               0xFFFFFFFF
 /******************************** Types   **********************************/
 
 typedef enum 
@@ -76,6 +113,9 @@ typedef enum
 }flags_t;
 
 
+
+
+
 typedef enum
 {
     TURN_LED        = 0,
@@ -85,17 +125,12 @@ typedef enum
     SENSOR_HUM      = 4,
     SENSOR_LIGHT    = 5,
     SENSOR_PRESS    = 6
-}topic_index_t;
+}topicex_t;
 
 /******************************** Variables ********************************/
 
 extern uint32_t flags;
-/*
-static char* topics [] = 
-{
-    "/"
-}
-*/
+
 /******************************** Prototypes *******************************/
 
 

@@ -155,7 +155,7 @@ void turnOffLed ( fsm_t* this )
 
   fsm_led_t* fsm = (fsm_led_t*)this;
 
-  CLEAR_FLAGS(fsm->data.flags, LED_OFF);
+  CLEAR_FLAGS(fsm->data.flags, LED_OFF | LED_COLOR | LED_ON);
 
   fsm->interface.pwmSet(fsm->data.rPin, 0);
   fsm->interface.pwmSet(fsm->data.gPin, 0);
@@ -416,7 +416,7 @@ int checkButton(fsm_t* this)
   fsm_control_t* fsm = (fsm_control_t*)this;
   uint32_t btnPin = fsm->data.btnPin;
   
-  return fsm->interface.readGPIO(btnPin);
+  return !fsm->interface.readGPIO(btnPin);
 }
 
 /**
@@ -464,7 +464,7 @@ int checkNotButtonTimerLower(fsm_t* this)
   fsm_control_t* fsm = (fsm_control_t*)this;
   uint32_t btnPin = fsm->data.btnPin;
 
-  if( (fsm->interface.getTickCount() - fsm->data.tickCounter < BUTTON_TIME) && (!fsm->interface.readGPIO(btnPin)))
+  if( (fsm->interface.getTickCount() - fsm->data.tickCounter < BUTTON_TIME) && (fsm->interface.readGPIO(btnPin)))
   {
     return 1;
   }
@@ -479,9 +479,25 @@ int checkNotButtonTimerLower(fsm_t* this)
 void enableConnect(fsm_t* this)
 {
   fsm_control_t* fsm = (fsm_control_t*)this;
-  fsm->interface.mqttConnect();
-  fsm->interface.wifiConnect();
-  CLEAR_FLAGS(fsm->data.flags, START);
+
+
+
+  if(IS_FLAG(fsm->data.flags, WIFI_CONNECTED))
+  {
+    fsm->interface.mqttConnect();
+    fsm->interface.delay(500);
+  }
+  else
+  {
+    fsm->interface.wifiConnect();
+  }
+  
+  if(IS_FLAG(fsm->data.flags, MQTT_CONNECTED))
+  {
+    CLEAR_FLAGS(fsm->data.flags, START);
+  }
+
+  
 }
 
 /**
@@ -492,7 +508,10 @@ void enableConnect(fsm_t* this)
 void enableEnterConfig(fsm_t* this)
 {
   fsm_control_t* fsm = (fsm_control_t*)this;
+  fsm->interface.serverStart();
+  CLEAR_FLAGS(fsm->data.flags, START);
   SET_FLAGS(fsm->data.flags, CONFIGURE);
+ 
 }
 
 /**
@@ -511,8 +530,24 @@ void startTimerButton (fsm_t* this)
  * 
  * @param this fsm structure used
  */
+
+
+
 void enableStart(fsm_t* this)
 {
   fsm_control_t* fsm = (fsm_control_t*)this;
+
+  #ifdef DEBUG
+
+  #endif // DEBUG
+
+
+  fsm->interface.subscribe(TURN_LED_TOPIC,     TURN_LED);
+  fsm->interface.subscribe(TURN_ALARM_TOPIC,   TURN_ALARM);
+  fsm->interface.subscribe(COLOR_LED_TOPIC,    COLOR_LED);
+  fsm->interface.subscribe(SENSOR_TEMP_TOPIC,  SENSOR_TEMP);
+  fsm->interface.subscribe(SENSOR_HUM_TOPIC,   SENSOR_HUM);
+  fsm->interface.subscribe(SENSOR_LIGHT_TOPIC, SENSOR_LIGHT);
+
   SET_FLAGS(fsm->data.flags, START);
 }

@@ -35,8 +35,8 @@
 /******************************** Types   **********************************/
 
 #define DEFAULT_DUTY      50
-#define SENSOR_TICK_RATE  1000
-#define BUTTON_TIME       10
+#define SENSOR_TICK_RATE  5000
+#define BUTTON_TIME       10000
 
 
 /******************************** Variables ********************************/
@@ -135,6 +135,8 @@ static fsm_trans_t led_fsm[] =
 {
   { IDLE,       checkStart,         WAITING,    NULL        },
   { WAITING,    checkOnLed,         LIGHT_ON,   turnOnLed   },
+  { WAITING,    checkOffLed,        WAITING,    turnOffLed  },
+  { WAITING,    checkColorChange,   WAITING,    turnOffLed  },
   { LIGHT_ON,   checkColorChange,   LIGHT_ON,   changeColor },
   { LIGHT_ON,   checkOffLed,        WAITING,    turnOffLed  },
   { LIGHT_ON,   checkSystemReset,   IDLE,       turnOffLed  },

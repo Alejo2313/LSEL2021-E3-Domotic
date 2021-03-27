@@ -106,4 +106,6 @@ void topic_subscribe( const char* topic, uint8_t topicIndex );
  */
 esp_err_t topic_publish(int topicId, const char* data, uint16_t len );
 
+
+void mqtt_stop(void);
 #endif

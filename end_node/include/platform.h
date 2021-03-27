@@ -52,7 +52,15 @@
 #include "bme280.h"
 #include "bme280_defs.h"
 
+#include "fsm.h"
+#include "wifi_conn.h"
+#include "mqtt_ext.h"
 #include "defines.h"
+#include "fsm_functions.h"
+#include "server.h"
+
+
+
 
 /******************************** Defines **********************************/
 
@@ -75,6 +83,7 @@
 #define LEDB_GPIO       4
 #define LEDB_CHANNEL    LEDC_CHANNEL_2
 
+
 //I2C definitions 
 
 #define BME_ADDR        BME280_I2C_ADDR_PRIM
@@ -83,7 +92,8 @@
 #define I2C_PORT        I2C_NUM_0
 #define I2C_SPEED       1000000
 
-#define BTN_PIN         12
+#define BTN_PIN         GPIO_NUM_15
+#define ALARM_PIN       GPIO_NUM_8
 
 // GPIO definitions
 
@@ -92,10 +102,7 @@
 
 
 
-#define wifiConnect     wifi_init_sta
-#define mqttConnect     mqtt_start
-#define getData_mqtt    getIncomeData
-#define sendData_mqtt   topic_publish
+
 
 /******************************** Types   **********************************/
 
@@ -172,6 +179,13 @@ int readTemp();     //
 int readLight();    //
 
 /**
+ * @brief Read pressure
+ * 
+ * @return int pressure 
+ */
+int readPress();
+
+/**
  * @brief Enter in configuration mode
  * 
  */
@@ -191,6 +205,8 @@ void delayMs(uint32_t ms);
  * @return uint64_t number of ticks 
  */
 uint64_t getTickCount();   
+
+
 
 
 #endif // DEBUG

@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "wifi_conn.h": "c",
+        "mqtt_ext.h": "c",
+        "server.h": "c",
+        "platform.h": "c"
+    }
+}
