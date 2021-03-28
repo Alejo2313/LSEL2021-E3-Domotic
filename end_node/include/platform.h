@@ -208,5 +208,7 @@ uint64_t getTickCount();
 
 
 
+void save_data();
+void load_data();
 
 #endif // DEBUG

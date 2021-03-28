@@ -151,29 +151,28 @@ fsm_control_t fsm_control =
 
 void app_main(void)
 {
-    ESP_LOGI(TAG, "[APP] Startup..");
-    ESP_LOGI(TAG, "[APP] Free memory: %d bytes", esp_get_free_heap_size());
-    ESP_LOGI(TAG, "[APP] IDF version: %s", esp_get_idf_version()); 
+
+    esp_log_level_set("*", ESP_LOG_NONE);
 
 
-    strcpy(wifi_ssid, DEFAULT_SSID);
-    strcpy(wifi_password, DEFAULT_PASSWORD);
-    strcpy(mqtt_broker_url, DEFAULT_BROKER);
 
-    nvs_flash_init();
+    //Init system
+    ESP_ERROR_CHECK(nvs_flash_init());
     ESP_ERROR_CHECK(esp_event_loop_create_default());
     esp_netif_init();
     esp_netif_create_default_wifi_sta();
     esp_netif_create_default_wifi_ap();
 
+    //Config hardware 
+    load_data();
     sensorInit();
     configPWM();
 
+    //init FSM
     fsm_init((fsm_t*)(&fsm_event), eventos_fsm);
     fsm_init((fsm_t*)(&fsm_led), led_fsm);
     fsm_init((fsm_t*)(&fsm_control), control_fsm);
-
-   fsm_init((fsm_t*)(&fsm_sensor), sensor_fsm);
+    fsm_init((fsm_t*)(&fsm_sensor), sensor_fsm);
     
     
     while (1)
@@ -183,10 +182,10 @@ void app_main(void)
         fsm_fire((fsm_t*)(&fsm_control));
         fsm_fire((fsm_t*)(&fsm_event));
         fsm_fire((fsm_t*)(&fsm_led));
-       fsm_fire((fsm_t*)(&fsm_sensor));
+        fsm_fire((fsm_t*)(&fsm_sensor));
 
-   //     printf("stateC %d StateE %d stateL %d stateS %d tick %d flags %X\n", fsm_control.fsm.current_state , fsm_event.fsm.current_state, fsm_led.fsm.current_state,fsm_sensor.fsm.current_state ,fsm_control.interface.readGPIO(BTN_PIN), flags);
-        vTaskDelay(100 / portTICK_PERIOD_MS);
+        ESP_LOGI("*","stateC %d StateE %d stateL %d stateS %d tick %d flags %X\n", fsm_control.fsm.current_state , fsm_event.fsm.current_state, fsm_led.fsm.current_state,fsm_sensor.fsm.current_state ,fsm_control.interface.readGPIO(BTN_PIN), flags);
+        vTaskDelay(50 / portTICK_PERIOD_MS);
     }
     
 }

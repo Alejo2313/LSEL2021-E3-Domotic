@@ -576,3 +576,118 @@ int readLight()
 {
     return 33;
 }
+
+#define STORAGE_NAMESPACE "storage"
+
+size_t get_string(char* key, char* value)
+{
+    nvs_handle_t my_handle;
+    esp_err_t err;
+    size_t size = 0;  
+
+    // Open
+    err = nvs_open(STORAGE_NAMESPACE, NVS_READWRITE, &my_handle);
+    if (err != ESP_OK)
+    {
+        ESP_LOGI(TAG, "Failed to open.");
+        return 0;
+    }
+
+    err = nvs_get_blob(my_handle, key, NULL, &size);
+    if (err != ESP_OK && err != ESP_ERR_NVS_NOT_FOUND) return err;
+
+    if ( size > 0)
+    {
+        err = nvs_get_blob(my_handle, key, value, &size);
+        if (err != ESP_OK && err != ESP_ERR_NVS_NOT_FOUND)
+        {
+            ESP_LOGI(TAG, "Failed to get. %d ",err);
+            ESP_ERROR_CHECK(err);
+            return 0;
+        } 
+
+        err = nvs_commit(my_handle);
+        if (err != ESP_OK)
+        {
+            return 0;
+        }
+    }
+ 
+
+    // Close
+    nvs_close(my_handle);
+    return size;
+
+}
+
+esp_err_t save_string(char* key, char* value)
+{
+    nvs_handle_t my_handle;
+    esp_err_t err;
+
+    // Open
+    err = nvs_open(STORAGE_NAMESPACE, NVS_READWRITE, &my_handle);
+    if (err != ESP_OK)
+    {
+        
+        return err;
+    } 
+    ESP_LOGI(TAG, "save.%s %d ", value, strlen(value));
+    err = nvs_set_blob(my_handle, key, value, strlen(value));
+
+    if (err != ESP_OK)
+    {
+        ESP_LOGI(TAG, "Failed to set save. %d ", strlen(value));
+        return err;
+    } 
+
+    err = nvs_commit(my_handle);
+    if (err != ESP_OK)
+    {
+        ESP_LOGI(TAG, "Failed to commit save.");
+        return err;
+    } 
+ 
+    nvs_close(my_handle);
+    return ESP_OK;
+}
+
+
+void load_data()
+{
+    size_t  size;
+    uint8_t save = 0;
+
+    size = get_string("SSID", wifi_ssid);
+    if( size ==  0 )
+    {
+        strcpy(wifi_ssid, DEFAULT_SSID);
+        save = 1;
+    }
+
+    size = get_string("PASS", wifi_password);
+    if( size ==  0 )
+    {
+        strcpy(wifi_password, DEFAULT_PASSWORD);
+        save = 1;
+    }
+    size = get_string("BROKER", mqtt_broker_url);
+    if( size ==  0 )
+    {
+        strcpy(mqtt_broker_url, DEFAULT_BROKER);
+        save = 1;
+    }
+
+    if(save == 1)
+    {
+        save_data();
+    }
+    
+}
+
+void save_data()
+{
+    save_string("SSID", wifi_ssid);
+    save_string("PASS", wifi_password);
+    save_string("BROKER", mqtt_broker_url);
+}

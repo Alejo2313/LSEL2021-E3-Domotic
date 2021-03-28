@@ -7,6 +7,8 @@ char mqtt_broker_url[64];
 static const char *TAG = "Server";
 
 uint32_t flags;
+httpd_handle_t server = NULL;
+
 
 static esp_err_t start_get_handler(httpd_req_t *req);
 static esp_err_t config_get_handler(httpd_req_t *req);
@@ -37,7 +39,6 @@ static esp_err_t start_get_handler(httpd_req_t *req)
 
 static esp_err_t config_get_handler(httpd_req_t *req)
 {
-    ESP_LOGI(TAG, "POST");
     char*  buf;
     size_t buf_len;
 
@@ -84,24 +85,6 @@ static esp_err_t config_get_handler(httpd_req_t *req)
     return ESP_OK;
 }
 
-
-esp_err_t http_404_error_handler(httpd_req_t *req, httpd_err_code_t err)
-{
-    if (strcmp("/hello", req->uri) == 0) {
-        httpd_resp_send_err(req, HTTPD_404_NOT_FOUND, "/hello URI is not available");
-        /* Return ESP_OK to keep underlying socket open */
-        return ESP_OK;
-    } else if (strcmp("/echo", req->uri) == 0) {
-        httpd_resp_send_err(req, HTTPD_404_NOT_FOUND, "/echo URI is not available");
-        /* Return ESP_FAIL to close underlying socket */
-        return ESP_FAIL;
-    }
-    /* For any other URI send 404 and close socket */
-    httpd_resp_send_err(req, HTTPD_404_NOT_FOUND, "Some 404 error message");
-    return ESP_FAIL;
-}
-
-httpd_handle_t server = NULL;
 
 void start_webserver(void)
 {

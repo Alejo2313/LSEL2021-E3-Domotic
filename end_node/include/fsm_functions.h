@@ -36,7 +36,7 @@
 
 #define DEFAULT_DUTY      50
 #define SENSOR_TICK_RATE  5000
-#define BUTTON_TIME       10000
+#define BUTTON_TIME       1000
 
 
 /******************************** Variables ********************************/

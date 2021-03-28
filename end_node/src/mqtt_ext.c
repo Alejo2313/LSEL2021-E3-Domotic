@@ -45,7 +45,7 @@ char wifi_password[64];
 char mqtt_broker_url[64];
 
 
-static esp_mqtt_client_handle_t client;             //<! MQTT Client struct
+static esp_mqtt_client_handle_t client = NULL;             //<! MQTT Client struct
 static char brokerURL[32];                          //<! MQTT broker URL
 
 uint32_t flags;
@@ -248,5 +248,9 @@ void mqtt_start(void)
 
 void mqtt_stop(void)
 {
-    esp_mqtt_client_stop(client);
+    if( client != NULL)
+    {
+        esp_mqtt_client_stop(client);
+    }
+   
 }
