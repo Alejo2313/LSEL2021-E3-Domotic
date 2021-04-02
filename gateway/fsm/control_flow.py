@@ -43,38 +43,37 @@ class Control_flow (object):
 
 
 
-
 fsm = Control_flow("GW")
-print(fsm.state)
-while (True):
-    ctrl=input("Insert key:")
-    if (ctrl=="1"):
-        fsm.start()
-        print(fsm.state)
-    elif (ctrl=="2"):
-        fsm.new_data()
-        print(fsm.state)
-    elif (ctrl=="3"):
-        fsm.need_response()
-        print(fsm.state)
-    elif (ctrl=="4"):
-        fsm.no_need_command()
-        print(fsm.state)
-    elif (ctrl=="5"):
-        fsm.resp_ready()
-        print(fsm.state)
-    elif (ctrl=="6"):
-        fsm.new_order()
-        print(fsm.state)
-    elif (ctrl=="7"):
-        fsm.need_data()
-        print(fsm.state)
-    elif (ctrl=="8"):
-        fsm.no_need_data()
-        print(fsm.state)
-    elif (ctrl=="9"):
-        fsm.data_ready()
-        print(fsm.state)
+# print(fsm.state)
+# while (True):
+#     ctrl=input("Insert key:")
+#     if (ctrl=="1"):
+#         fsm.start()
+#         print(fsm.state)
+#     elif (ctrl=="2"):
+#         fsm.new_data()
+#         print(fsm.state)
+#     elif (ctrl=="3"):
+#         fsm.need_response()
+#         print(fsm.state)
+#     elif (ctrl=="4"):
+#         fsm.no_need_command()
+#         print(fsm.state)
+#     elif (ctrl=="5"):
+#         fsm.resp_ready()
+#         print(fsm.state)
+#     elif (ctrl=="6"):
+#         fsm.new_order()
+#         print(fsm.state)
+#     elif (ctrl=="7"):
+#         fsm.need_data()
+#         print(fsm.state)
+#     elif (ctrl=="8"):
+#         fsm.no_need_data()
+#         print(fsm.state)
+#     elif (ctrl=="9"):
+#         fsm.data_ready()
+#         print(fsm.state)
         
 # fsm.start()
-# fsm.machine.get_graph().draw('control_fsm.png',prog='dot')
+fsm.machine.get_graph().draw('control_fsm.png',prog='dot')

@@ -3,7 +3,7 @@ import pytest
 
 @pytest.fixture
 def initial_fsm():
-    fsm = Controll_flow("GW")
+    fsm = Control_flow("GW")
     return fsm
 
 def test_initial_state(initial_fsm):
