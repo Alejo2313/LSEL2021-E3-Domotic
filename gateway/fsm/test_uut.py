@@ -1,12 +1,12 @@
 import unittest
-from control_flow import Controll_flow
+from control_flow import Control_flow
 
 class Test_control_flow_transitions(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """generates a fsm object before each test is launched
         """
-        cls._fsm =  Controll_flow("GW")
+        cls._fsm =  Control_flow("GW")
 
     def test_void_name(self):
         """checks the non void name parameter
