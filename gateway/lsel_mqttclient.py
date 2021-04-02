@@ -58,11 +58,6 @@ def on_connect_suscriber(client, userdata, flags, rc):
 # Arg N5 : Gateway name
 brokers = "mosquitto or paho-mqtt"
 
-import paho.mqtt.client as mqtt
-import json
-import sys
-import time
-
 def on_message_suscriber_default(client, userdata, msg):
     """[Personalized on_message() callback to suit 
     the necessities of the LSEL project.
@@ -163,7 +158,7 @@ class mqtt_subscriber(mqtt_client):
         else:
             self.subscribe_topic=subscribe_topic
 
-        self.client=client= mqtt.Client(client_id=client_id)
+        self.client= mqtt.Client(client_id=client_id)
         self.client.on_message = on_msg_function
 
     def get_subscribe_topic(self):

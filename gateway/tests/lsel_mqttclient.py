@@ -116,7 +116,7 @@ class mqtt_subscriber(mqtt_client):
         else:
             self.subscribe_topic=subscribe_topic
 
-        self.client=client= mqtt.Client(client_id=client_id)
+        self.client= mqtt.Client(client_id=client_id)
         self.client.on_message = self.on_msg_function
 
     def get_subscribe_topic(self):
