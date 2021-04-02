@@ -29,17 +29,52 @@ class Control_flow (object):
         self.machine = Machine(model = self, states = Control_flow.states,
             initial = 'CONFIG', transitions=Control_flow.transitions)
 
+    def send_data(self):
+        print("data sent")
+
+    def wait(self):
+        print("waiting")
+
+    def send_order(self):
+        print("order sent")
+
     def ready_to_work(self):
         return True
-    
-    def print_antes(self):
-        print("tuputamadre antes")
-        print(fsm.state)
-    def print_despues(self):
-        print("tuputamadre despues")
-        print(fsm.state)
+
+
+
 
 fsm = Control_flow("GW")
+print(fsm.state)
+while (True):
+    ctrl=input("Insert key:")
+    if (ctrl=="1"):
+        fsm.start()
+        print(fsm.state)
+    elif (ctrl=="2"):
+        fsm.new_data()
+        print(fsm.state)
+    elif (ctrl=="3"):
+        fsm.need_response()
+        print(fsm.state)
+    elif (ctrl=="4"):
+        fsm.no_need_command()
+        print(fsm.state)
+    elif (ctrl=="5"):
+        fsm.resp_ready()
+        print(fsm.state)
+    elif (ctrl=="6"):
+        fsm.new_order()
+        print(fsm.state)
+    elif (ctrl=="7"):
+        fsm.need_data()
+        print(fsm.state)
+    elif (ctrl=="8"):
+        fsm.no_need_data()
+        print(fsm.state)
+    elif (ctrl=="9"):
+        fsm.data_ready()
+        print(fsm.state)
+        
 # fsm.start()
-# print(fsm.state)
 # fsm.machine.get_graph().draw('control_fsm.png',prog='dot')
