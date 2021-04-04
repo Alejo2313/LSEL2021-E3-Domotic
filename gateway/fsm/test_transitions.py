@@ -36,7 +36,7 @@ class Test_control_flow_transitions(unittest.TestCase):
 
     def test_no_need_response(self):
         self._fsm.to_PROCESS_DATA()
-        self._fsm.no_need_command()
+        self._fsm.no_need_response()
         self.assertEqual(self._fsm.state,"IDLE")
 
     def test_resp_ready(self):

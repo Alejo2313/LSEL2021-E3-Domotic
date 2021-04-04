@@ -35,7 +35,7 @@ class mqtt_publisher(mqtt_client):
         else:
             self.client_id=client_id
 
-        self.client=client= mqtt.Client(client_id=client_id)
+        self.client= mqtt.Client(client_id=client_id)
 
     def publish_msg(self, topic_base_id, endpoint_id, msg):
         """[function that publishes a message to a specific topic
