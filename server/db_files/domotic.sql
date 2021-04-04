@@ -1,6 +1,6 @@
-﻿CREATE TABLE IF NOT EXISTS `Users` (
-    `UserID` int  NOT NULL ,
-    `NickName` TEXT NOT NULL ,
+CREATE TABLE IF NOT EXISTS `Users` (
+    `UserID` int  NOT NULL AUTO_INCREMENT,
+    `NickName` varchar(64) NOT NULL UNIQUE,
     `Password` varchar(64)  NOT NULL ,
     `IsAdmin` bool  NOT NULL ,
     PRIMARY KEY (
@@ -9,9 +9,9 @@
 );
 
 CREATE TABLE `Gateways` (
-    `GatewayID` int  NOT NULL ,
+    `GatewayID` int  NOT NULL AUTO_INCREMENT,
     `AdminID` int  NOT NULL ,
-    `GatewayKey` varchar(32)  NOT NULL ,
+    `GatewayKey` varchar(32)  NOT NULL UNIQUE,
     `IsValid` bool  NOT NULL ,
     PRIMARY KEY (
         `GatewayID`
@@ -24,9 +24,9 @@ CREATE TABLE `UserGateways` (
 );
 
 CREATE TABLE `Devices` (
-    `DeviceID` int  NOT NULL ,
+    `DeviceID` int  NOT NULL AUTO_INCREMENT,
     `GatewayID` int  NOT NULL ,
-    `UUID` int  NOT NULL ,
+    `UUID` varchar(32)  NOT NULL ,
     PRIMARY KEY (
         `DeviceID`
     )
@@ -34,24 +34,25 @@ CREATE TABLE `Devices` (
 
 CREATE TABLE `Sensors` (
     `DeviceID` int  NOT NULL ,
-    `SensorID` int  NOT NULL ,
+    `SensorID` int  NOT NULL AUTO_INCREMENT,
     `Type` int  NOT NULL ,
     `DataType` int  NOT NULL ,
     PRIMARY KEY (
-        `DeviceID`
+        `SensorID`
     )
 );
 
 CREATE TABLE `InData` (
     `SensorID` int  NOT NULL ,
-    `TimeStamp` date  NOT NULL ,
+    `TimeStamp` time  NOT NULL ,
     `Data` TEXT  NOT NULL 
 );
 
 CREATE TABLE `OutData` (
     `SensorID` int  NOT NULL ,
-    `TimeStamp` date  NOT NULL ,
-    `Data` TEXT  NOT NULL 
+    `TimeStamp` time  NOT NULL ,
+    `Data` TEXT  NOT NULL ,
+    `uptimed` int NOT NULL
 );
 
 ALTER TABLE `UserGateways` ADD CONSTRAINT `fk_UserGateways_UserID` FOREIGN KEY(`UserID`)
@@ -70,5 +71,4 @@ ALTER TABLE `InData` ADD CONSTRAINT `fk_InData_SensorID` FOREIGN KEY(`SensorID`)
 REFERENCES `Sensors` (`SensorID`);
 
 ALTER TABLE `OutData` ADD CONSTRAINT `fk_OutData_SensorID` FOREIGN KEY(`SensorID`)
-REFERENCES `Sensors` (`SensorID`); "
-
+REFERENCES `Sensors` (`SensorID`);
