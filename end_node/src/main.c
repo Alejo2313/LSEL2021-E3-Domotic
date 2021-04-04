@@ -184,7 +184,7 @@ void app_main(void)
         fsm_fire((fsm_t*)(&fsm_led));
         fsm_fire((fsm_t*)(&fsm_sensor));
 
-        ESP_LOGI("*","stateC %d StateE %d stateL %d stateS %d tick %d flags %X\n", fsm_control.fsm.current_state , fsm_event.fsm.current_state, fsm_led.fsm.current_state,fsm_sensor.fsm.current_state ,fsm_control.interface.readGPIO(BTN_PIN), flags);
+        ESP_LOGI(TAG,"stateC %d StateE %d stateL %d stateS %d tick %d flags %X\n", fsm_control.fsm.current_state , fsm_event.fsm.current_state, fsm_led.fsm.current_state,fsm_sensor.fsm.current_state ,fsm_control.interface.readGPIO(BTN_PIN), flags);
         vTaskDelay(50 / portTICK_PERIOD_MS);
     }
     

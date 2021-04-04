@@ -1,7 +1,7 @@
 #ifndef __HTML_SRC_H__
 #define __HTML_SRC_H__
 
-static char* configHTML =
+__unused static char* configHTML =
         "<!DOCTYPE html>\n"
         "<html>\n"
         "<body>\n"

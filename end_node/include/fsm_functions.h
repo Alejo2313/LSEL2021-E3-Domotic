@@ -121,7 +121,7 @@ void enableStart(fsm_t* this);
 /******************************** Tables ********************************/
 
 
-static fsm_trans_t sensor_fsm[] = {
+__unused static fsm_trans_t sensor_fsm[] = {
   { IDLE,   checkStart,           WAIT,     startTimerSensor  },
   { WAIT,   checkTimerSensor,     READ,     readData          },
   { READ,   checkSystemReset,     IDLE,     NULL              },
@@ -131,7 +131,7 @@ static fsm_trans_t sensor_fsm[] = {
 };
 
 
-static fsm_trans_t led_fsm[] = 
+__unused static fsm_trans_t led_fsm[] = 
 {
   { IDLE,       checkStart,         WAITING,    NULL        },
   { WAITING,    checkOnLed,         LIGHT_ON,   turnOnLed   },
@@ -145,7 +145,7 @@ static fsm_trans_t led_fsm[] =
 };
 
 
-static fsm_trans_t eventos_fsm[] = {
+__unused static fsm_trans_t eventos_fsm[] = {
   { IDLE,   checkStart,             COMM,     NULL          },
   { COMM,   checkFlagInData,        COMM,     processData   },
   { COMM,   checkFlagOutData,       COMM,     publishData   },
@@ -154,7 +154,7 @@ static fsm_trans_t eventos_fsm[] = {
 };
 
 
-static fsm_trans_t control_fsm[] = {
+__unused static fsm_trans_t control_fsm[] = {
   { IDLE,         checkNotConnected,          CONNECT,      enableConnect     },
   { IDLE,         checkButton,                BTN_IDLE,     startTimerButton  },
   { CONNECT,      checkConnected,             IDLE,         enableStart       },
