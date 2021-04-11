@@ -1,7 +1,7 @@
 from lsel_mqttclient import mqtt_publisher
 import sys
 # pub1=mqtt_publisher(broker_addr=sys.argv[1], gw_name=sys.argv[2],client_id=sys.argv[3])
-brokerAddres = "localhost"
-pub1=mqtt_publisher(broker_addr=brokerAddres, gw_name="gw",client_id="pub")
+brokerAddress = "localhost"
+pub1=mqtt_publisher(broker_addr=brokerAddress, gw_name="gw",client_id="pub")
 
-pub1.publish_msg(topic_base_id="/casa/salon/0001", endpoint_id="1", msg="00")
+pub1.publish_msg("/casa/salon/0001",  "D","O","1","00")

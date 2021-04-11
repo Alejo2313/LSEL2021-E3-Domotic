@@ -37,7 +37,7 @@ class mqtt_publisher(mqtt_client):
 
         self.client= mqtt.Client(client_id=client_id)
 
-    def publish_msg(self, topic_base_id, endpoint_id, msg):
+    def publish_msg(self, topic_base_id, data_t,device_t,endpoint_id,  msg):
         """[function that publishes a message to a specific topic
                 eg: /casa/salon/0001-I-A-1
                     topic_base_id=/casa/salon/0001, data_t=I, endpoint_t=A, endpoint_id=1]
@@ -47,7 +47,7 @@ class mqtt_publisher(mqtt_client):
             endpoint_id ([str]): [endpoint's identifier]
             msg ([byte]): [msg's payload to be sent]
         """
-        def get_publish_topic(topic_base_id,endpoint_id): 
+        def get_publish_topic(topic_base_id, data_t,device_t,endpoint_id): 
             """[returns stringed topic from the topic's base identifier and endpoint's identifier]
 
             Args:
@@ -57,7 +57,7 @@ class mqtt_publisher(mqtt_client):
             Returns:
                 [str]: [stringed complete topic]
             """
-            content= topic_base_id + "-I-A-" + endpoint_id
+            content= topic_base_id + "-"+data_t +"-"+ device_t+"-" + endpoint_id
             return str(content)
 
         if msg== None:
@@ -71,7 +71,7 @@ class mqtt_publisher(mqtt_client):
                 exit()
 
         self.client.connect(self.get_broker_addr(), 1883,60)
-        topic=get_publish_topic(topic_base_id, endpoint_id)
+        topic=get_publish_topic( topic_base_id, data_t,device_t,endpoint_id )
         self.client.publish(topic=topic, payload=msg)
 
 

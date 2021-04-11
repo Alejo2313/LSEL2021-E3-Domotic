@@ -34,7 +34,7 @@ class Control_flow (object):
     broker_ip = "localhost"
     header_json = {"Content-type": "application/json",
         "Accept" : "text/plain"}
-    msg_rcvd = ""
+    response = ""
     msg_json = ""
     
     def __init__(self,name):
@@ -46,15 +46,20 @@ class Control_flow (object):
         self.http_con = http_client("server",Control_flow.server_ip)
 
     def send_data(self):
-        if (Control_flow.msg_rcvd[len(Control_flow.msg_rcvd) -1] == "0"):
+        if (Control_flow.response == "I"):
             fsm.no_need_response()
             self.http_con.do_post("/gateData",
             self.msg_json,self.header_json)
         else:
+            print("Waiting for order")
+            time.sleep(5)
             fsm.need_response()
 
         print("data sent")
         print(fsm.state)
+
+    def get_name(self):
+        return str(self.name)
 
     def wait(self):
         print("waiting")
@@ -67,37 +72,42 @@ class Control_flow (object):
 
     def msg_deliver(self):
         return self.http_con.do_post("/gateData",
-            json.dumps(params),self.header_json) == 200
-    
-
+            json.dumps(self.msg_json),self.header_json) == 200
 
 def on_message_suscriber(client, userdata, msg):
-    raw_msg = str(msg.payload)
-    raw_tpc = str(msg.topic)
-    print("raw msg: " + raw_msg + "length = " + str(len(raw_msg)))
-    clean_msg = raw_msg[2:len(raw_msg)-1]
-    clean_tpc = raw_tpc.split("-")
-    print(clean_msg)
-    Control_flow.msg_rcvd = clean_msg
-    Control_flow.msg_json = json.dumps(
-        {
-            "gateway_name" : "Gateway_test",
-            "local_id" : clean_tpc[0],
-            "data_t" : clean_tpc[1],
-            "src_t" : clean_tpc[2],
-            "src_id" : clean_tpc[3],
-            "data" : clean_msg
-        }
-    )
+    msg_payload=str(msg.payload)
+    msg_topic= str(msg.topic)
+    splitted_msg_topic = msg_topic.split("-")
+    splitted_base_topic = splitted_msg_topic[0].split("/")
+    device_id=splitted_base_topic[len(splitted_base_topic)-1]
+    Control_flow.response = splitted_msg_topic[2]
+    try:
+        Control_flow.msg_json = json.dumps(
+            {
+                "Gateway": fsm.get_name(),
+                "Devices":[
+                    {   
+                        "Device":device_id,    
+                        "Sensors":[
+                            {
+                                "Type":splitted_msg_topic[1],
+                                "DType":splitted_msg_topic[2],
+                                "data":msg_payload.split("'")[1]
+                            }
+                        ]
+
+                    }
+                ]
+            }
+        )
+    except:
+        print("An exception occurred. Control object might not have been created.")
+    
+    print("JSON to send:\n"+Control_flow.msg_json)
     fsm.new_data()
 
 fsm = Control_flow("GW")
-print(fsm.state)
-params = {
-    "name" : "Hello",
-    "value": "World",
-    "back" : "0"
-}
+
 while (True):
     ctrl=input("Insert key:")
     if (ctrl=="1"):
@@ -123,9 +133,9 @@ while (True):
     # elif (ctrl=="4"):
     #     fsm.no_need_response()
     #     print(fsm.state)
-    # elif (ctrl=="5"):
-    #     fsm.resp_ready()
-    #     print(fsm.state)
+    elif (ctrl=="5"):
+        fsm.resp_ready()
+        print(fsm.state)
     elif (ctrl=="6"):
         fsm.new_order()
         print(fsm.state)
