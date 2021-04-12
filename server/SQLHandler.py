@@ -207,14 +207,15 @@ class QueryHandler:
             return {}
 
     def add_sensor(self, DeviceID, typeS, DataType):
+        query = "INSERT INTO Sensors (DeviceID, Type, DataType) VALUES (%s, %s, %s)"
+        data  = (DeviceID, typeS, DataType)
+        
 
         sensor = self.get_sensor(typeS=typeS, DeviceID=DeviceID)
 
         if ( len(sensor) > 0):
             return {}
         
-        query = "INSERT INTO Sensors (DeviceID, Type, DataType) VALUES (%s, %s, %s)"
-        data  = (DeviceID, typeS, DataType)
 
         self.cursor.execute(query, data)
         self.cnx.commit()
@@ -242,7 +243,7 @@ class QueryHandler:
     
     def request_data(self, GatewayUUID, updated):
 
-        query = """SELECT OutData.* 
+        query = """SELECT Devices.UUID, Sensors.Type, OutData.* 
                 FROM (((OutData 
                 INNER JOIN Sensors  ON Sensors.SensorID = OutData.SensorID)
                 INNER JOIN Devices  ON Devices.DeviceID = Sensors.DeviceID)
@@ -257,10 +258,12 @@ class QueryHandler:
         raw = self.cursor.fetchall()
 
         outData = []
-        for (SensorID, TimeStamp, Data, updated ) in raw:
+        for (UUID, SensorType, SensorID, TimeStamp, Data, updated ) in raw:
             element = {
+                "Device": UUID,
+                "SensorType": SensorType,
                 "SensorID":SensorID,
-                "TimeStamp":TimeStamp,
+                "TimeStamp":str(TimeStamp),
                 "Data":Data,
                 "updated":updated
             }

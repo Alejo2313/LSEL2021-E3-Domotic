@@ -1,0 +1,84 @@
+{% include "Header.html" %}
+
+<style>
+  .accordion {
+    background-color: #eee;
+    color: #444;
+    cursor: pointer;
+    width: 100%;
+    border: none;
+    text-align: left;
+    outline: none;
+    transition: 0.4s;
+  }
+  
+  .active, .accordion:hover {
+    background-color: #ccc; 
+  }
+  
+  .panel {
+    padding: 0 18px;
+    display: none;
+    background-color: white;
+    overflow: hidden;
+  }
+  </style>
+
+<div class="w3-main" style="margin-left:300px;margin-top:43px;">
+    <div class="w3-container">
+        <h5>Countries</h5>
+        {% for Gateway in Gateways %}
+        <div class="w3-cell-row w3-striped w3-bordered w3-border accordion w3-white">
+          <div class="w3-container w3-third w3-cell">
+            <p>{{ Gateway['GatewayID'] }}</p>
+          </div>
+        
+          <div class="w3-container w3-third w3-cell">
+            <p>{{ Gateway['UUID'] }}</p>
+          </div>
+
+          <div class="w3-container w3-third w3-cell">
+            <p>{{ Gateway['AdminNick'] }}</p>
+          </div>
+        </div>
+        <div class="panel">
+            <div class="w3-quarter"> </div>
+            <div class="w3-quarter"> test ID device</div>
+            <div class="w3-quarter"> test lalala</div>
+        </div>
+        {% end %}
+        <form class="w3-container" method='POST' >
+            <br>Register new Gateway</br>
+            <div class="w3-section">
+                <div class="w3-third">
+                <input class="w3-input w3-border w3-margin-bottom" type="text" placeholder="Enter Gateway id" name="UUID" required>
+                </div>
+              {% raw xsrf_form_html() %}
+              <div class="w3-third">
+                <button class="w3-button w3-block w3-border w3-green" type="submit">Register</button>
+              </div>
+              
+            </div>
+          </form>
+
+    </div>
+</div>
+
+<script>
+  var acc = document.getElementsByClassName("accordion");
+  var i;
+  
+  for (i = 0; i < acc.length; i++) {
+    acc[i].addEventListener("click", function() {
+      this.classList.toggle("active");
+      var panel = this.nextElementSibling;
+      if (panel.style.display === "block") {
+        panel.style.display = "none";
+      } else {
+        panel.style.display = "block";
+      }
+    });
+  }
+  </script>
+
+  {% include "Footer.html" %}

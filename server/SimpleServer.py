@@ -8,23 +8,35 @@ import numpy as np
 import plotly.express as px
 import plotly
 import pandas as pd
+import time
 from datetime import datetime
+
 from SQLHandler import QueryHandler
 
 
 class BaseHandler(tornado.web.RequestHandler):
 
     def get_current_user(self):
+        self.set_current_session()
         return self.get_secure_cookie("user")
 
     def get_current_id(self):
+        self.set_current_session()
         return self.get_secure_cookie("id")
 
     def set_current_user(self, user, userId):
+        self.set_current_session()
         print('setting secure cookie', user)
         self.set_secure_cookie("user", user)
         self.set_secure_cookie("id", userId)   
 
+    def set_current_session(self):
+        session = self.get_secure_cookie("session")
+        if(session is None):
+            self.set_secure_cookie("session", str(time.time()))
+            
+
+        
 class LoginHandler(BaseHandler):
 
     def get(self):
@@ -32,6 +44,7 @@ class LoginHandler(BaseHandler):
         self.render('data/Login.html', user=user)
 
     def post(self):
+        
         nickName = self.get_argument("user")
         password = self.get_argument("password")
 
@@ -74,6 +87,84 @@ class LogoutHandler(BaseHandler):
         self.clear_cookie("user")
         self.redirect("/")
 
+class PostDataHandler(BaseHandler):
+    def check_xsrf_cookie(self): 
+        pass
+
+    def get(self):
+        data = json.loads(self.request.body.decode('utf-8'))
+        if ( data is None ):
+            self.redirect("/")
+
+        gateway = db.get_gateway(data["Gateway"])
+
+        if( len(gateway) > 0):
+            request = db.request_data(data["Gateway"], 0)
+            self.write(json.dumps(request)) 
+            print(request)
+
+    def post(self):
+        data = json.loads(self.request.body.decode('utf-8'))
+      #  print(self.request.body.decode('utf-8'))
+        if ( data is None ):
+            self.redirect("/")
+
+        gateway = db.get_gateway(data["Gateway"])
+
+        if( len(gateway) > 0):
+            
+            for dev in data["Devices"]:
+                device = db.get_device(DeviceUUID = dev["Device"] , GatewayUUID = data["Gateway"])
+                if( len(device) == 0):
+                    device = db.add_device(UUID = dev["Device"], GatewayUUID = data["Gateway"] )
+
+                for sen in dev["Sensors"]:
+                
+                    sensor = db.get_sensor(typeS = sen["Type"] , DeviceID = device["DeviceID"])
+
+                    if(len(sensor) == 0):
+                        sensor = db.add_sensor(device["DeviceID"], sen["Type"], sen["DType"])
+                    print(sensor)
+                    db.push_data(GatewayUUID = data["Gateway"], DeviceUUID = dev["Device"], typeS=sen["Type"], Data = sen["data"])
+        else:
+            print("Gateway no found!")
+
+
+class GateWayHandler(BaseHandler):
+
+    def get(self):
+        user = self.get_current_user()
+        userID   = self.get_current_id()
+
+        if (user is None):
+            self.render('data/index.html', user = user)
+
+        gateIDs = db.get_user_gateways( userID = userID)
+        
+        gates = []
+
+        for  gID in gateIDs:
+            gate = db.get_gateway(GatewayID = gID)
+            if (len(gate) == 0 ):
+                return
+                
+            userx = db.get_user(UserID = gate["AdminID"])
+            gate["AdminNick"] = userx["NikName"]
+            
+            gates.append(gate)
+
+        print(gates)
+        self.render('data/Gateways.html', user = user, Gateways = gates)
+
+    def post(self):
+        user = self.get_current_user()
+        userID   = self.get_current_id()
+
+        gateUUID = self.get_argument("UUID")
+
+
+        db.add_gateway(userID = userID, UUID = gateUUID )
+        self.redirect("/gw")
 
 def make_app():   
     settings = {
@@ -86,7 +177,9 @@ def make_app():
             (r"/", IndexHandler),
             (r"/login", LoginHandler),
             (r"/logout", LogoutHandler),
-            (r"/register", RegisterHandler),            
+            (r"/register", RegisterHandler),
+            (r"/gw", GateWayHandler), 
+            (r"/data", PostDataHandler)           
             ], **settings)
 
 
@@ -95,22 +188,6 @@ if __name__ == "__main__":
     
     db = QueryHandler("server", "server12345678","server_db")
     
-
-    print(db.get_gateway("ABDCEH"))
-    print(db.add_device(UUID=2, GatewayUUID="ABDCEH"))
-
-    device = db.get_device(DeviceUUID = 2, GatewayUUID ="ABDCEH")
-
-    print(db.add_sensor(device["DeviceID"], 1, 1))
-
-    db.push_data(GatewayUUID="ABDCEH", DeviceUUID= device["UUID"], typeS = 1, Data = 33  )
-
-    db.push_request_data(GatewayUUID="ABDCEH", DeviceUUID= device["UUID"], typeS = 1, Data = 33  )
-    db.push_request_data(GatewayUUID="ABDCEH", DeviceUUID= device["UUID"], typeS = 1, Data = 34  )
-    db.push_request_data(GatewayUUID="ABDCEH", DeviceUUID= device["UUID"], typeS = 1, Data = 35  )
-
-
-    print( db.request_data( GatewayUUID = "ABDCEH", updated = 0))
 
     application = make_app()
     application.listen(8005)
