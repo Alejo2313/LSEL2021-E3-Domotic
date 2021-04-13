@@ -69,10 +69,19 @@ class mqtt_publisher(mqtt_client):
         if endpoint_id== None:
                 print("The endpoint_id you passed is not valid. Try again!")
                 exit()
+        if (data_t == "I"):
+            data = int(float(msg))
+        elif (data_t == "D"):
+            data = float(msg)
+        elif (data_t == "S"):
+            data = str(msg)
+        else:
+            print("Data type not supported: " + str(data_t))
+            exit()
 
         self.client.connect(self.get_broker_addr(), 1883,60)
         topic=get_publish_topic( topic_base_id, data_t,device_t,endpoint_id )
-        self.client.publish(topic=topic, payload=msg)
+        self.client.publish(topic=topic, payload=data)
 
 
 class mqtt_subscriber(mqtt_client):

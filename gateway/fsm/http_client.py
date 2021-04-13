@@ -34,7 +34,7 @@ class http_client(object):
         return response.status
 
     def create_connection(self):
-        conn = http.client.HTTPConnection(self.get_server_ip(),80, timeout=10)
+        conn = http.client.HTTPConnection("localhost",8080, timeout=10)
         return conn
     
 

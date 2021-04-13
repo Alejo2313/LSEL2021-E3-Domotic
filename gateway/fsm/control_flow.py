@@ -31,7 +31,7 @@ class Control_flow (object):
 
     server_ip = "40.114.216.24"
 #    broker_ip = "192.168.1.41"
-    broker_ip = "localhost"
+    broker_ip = "51.103.29.76"
     header_json = {"Content-type": "application/json",
         "Accept" : "text/plain"}
     response = ""
@@ -46,14 +46,15 @@ class Control_flow (object):
         self.http_con = http_client("server",Control_flow.server_ip)
 
     def send_data(self):
-        if (Control_flow.response == "I"):
-            fsm.no_need_response()
-            self.http_con.do_post("/gateData",
-            self.msg_json,self.header_json)
-        else:
-            print("Waiting for order")
-            time.sleep(5)
-            fsm.need_response()
+#        if (Control_flow.response == "1"): #Revisar 
+        fsm.no_need_response()
+        print("Puta")
+        self.http_con.do_post("/data",
+        self.msg_json,self.header_json)
+        # else:
+        #     print("Waiting for order")
+        #     time.sleep(5)
+        #     fsm.need_response()
 
         print("data sent")
         print(fsm.state)
@@ -68,10 +69,11 @@ class Control_flow (object):
         print("order sent")
 
     def ready_to_work(self):
-        return self.http_con.do_get("/") == 200
+#        return self.http_con.do_get("/") == 200
+        return True
 
     def msg_deliver(self):
-        return self.http_con.do_post("/gateData",
+        return self.http_con.do_post("/data",
             json.dumps(self.msg_json),self.header_json) == 200
 
 def on_message_suscriber(client, userdata, msg):
@@ -81,6 +83,7 @@ def on_message_suscriber(client, userdata, msg):
     splitted_base_topic = splitted_msg_topic[0].split("/")
     device_id=splitted_base_topic[len(splitted_base_topic)-1]
     Control_flow.response = splitted_msg_topic[2]
+    values = {"S":2, "D": 1, "I": 0}
     try:
         Control_flow.msg_json = json.dumps(
             {
@@ -90,8 +93,8 @@ def on_message_suscriber(client, userdata, msg):
                         "Device":device_id,    
                         "Sensors":[
                             {
-                                "Type":splitted_msg_topic[1],
-                                "DType":splitted_msg_topic[2],
+                                "DType":values[splitted_msg_topic[1]],
+                                "Type":splitted_msg_topic[2],
                                 "data":msg_payload.split("'")[1]
                             }
                         ]
@@ -106,15 +109,15 @@ def on_message_suscriber(client, userdata, msg):
     print("JSON to send:\n"+Control_flow.msg_json)
     fsm.new_data()
 
-fsm = Control_flow("GW")
+fsm = Control_flow("gw1234")
 
 while (True):
     ctrl=input("Insert key:")
     if (ctrl=="1"):
         fsm.start()
         print(fsm.state)
-        sub1=mqtt_subscriber(broker_addr=Control_flow.broker_ip, gw_name="gw",client_id="sub",
-            subscribe_topic="/casa",on_msg_function = on_message_suscriber)
+        sub1=mqtt_subscriber(broker_addr=Control_flow.broker_ip, gw_name="gw1234",client_id="sub",
+            subscribe_topic="/HOME",on_msg_function = on_message_suscriber)
         sub1.sub_all_connect()
         
 #    elif (ctrl=="2"):
