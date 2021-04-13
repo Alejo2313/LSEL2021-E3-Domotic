@@ -31,7 +31,7 @@ class Control_flow (object):
 
     server_ip = "40.114.216.24"
 #    broker_ip = "192.168.1.41"
-    broker_ip = "51.103.29.76"
+    broker_ip = "localhost"
     header_json = {"Content-type": "application/json",
         "Accept" : "text/plain"}
     response = ""
@@ -69,14 +69,16 @@ class Control_flow (object):
         print("order sent")
 
     def ready_to_work(self):
-#        return self.http_con.do_get("/") == 200
-        return True
+        res = self.http_con.do_get("/")
+        print(res)
+        return res == 200
 
     def msg_deliver(self):
         return self.http_con.do_post("/data",
             json.dumps(self.msg_json),self.header_json) == 200
 
 def on_message_suscriber(client, userdata, msg):
+    print("pm")
     msg_payload=str(msg.payload)
     msg_topic= str(msg.topic)
     splitted_msg_topic = msg_topic.split("-")
@@ -117,7 +119,7 @@ while (True):
         fsm.start()
         print(fsm.state)
         sub1=mqtt_subscriber(broker_addr=Control_flow.broker_ip, gw_name="gw1234",client_id="sub",
-            subscribe_topic="/HOME",on_msg_function = on_message_suscriber)
+            subscribe_topic="/home",on_msg_function = on_message_suscriber)
         sub1.sub_all_connect()
         
 #    elif (ctrl=="2"):

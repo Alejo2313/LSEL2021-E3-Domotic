@@ -37,7 +37,7 @@ class mqtt_publisher(mqtt_client):
 
         self.client= mqtt.Client(client_id=client_id)
 
-    def publish_msg(self, topic_base_id, endpoint_id, msg):
+    def publish_msg(self, topic_base_id, data_t,device_t,endpoint_id,  msg):
         """[function that publishes a message to a specific topic
                 eg: /casa/salon/0001-I-A-1
                     topic_base_id=/casa/salon/0001, data_t=I, endpoint_t=A, endpoint_id=1]
@@ -47,7 +47,7 @@ class mqtt_publisher(mqtt_client):
             endpoint_id ([str]): [endpoint's identifier]
             msg ([byte]): [msg's payload to be sent]
         """
-        def get_publish_topic(topic_base_id,endpoint_id): 
+        def get_publish_topic(topic_base_id, data_t,device_t,endpoint_id): 
             """[returns stringed topic from the topic's base identifier and endpoint's identifier]
 
             Args:
@@ -57,7 +57,7 @@ class mqtt_publisher(mqtt_client):
             Returns:
                 [str]: [stringed complete topic]
             """
-            content= topic_base_id + "-I-A-" + endpoint_id
+            content= topic_base_id + "-"+data_t +"-"+ device_t+"-" + endpoint_id
             return str(content)
 
         if msg== None:
@@ -69,10 +69,19 @@ class mqtt_publisher(mqtt_client):
         if endpoint_id== None:
                 print("The endpoint_id you passed is not valid. Try again!")
                 exit()
+        if (data_t == "I"):
+            data = int(float(msg))
+        elif (data_t == "D"):
+            data = float(msg)
+        elif (data_t == "S"):
+            data = str(msg)
+        else:
+            print("Data type not supported: " + str(data_t))
+            exit()
 
         self.client.connect(self.get_broker_addr(), 1883,60)
-        topic=get_publish_topic(topic_base_id, endpoint_id)
-        self.client.publish(topic=topic, payload=msg)
+        topic=get_publish_topic( topic_base_id, data_t,device_t,endpoint_id )
+        self.client.publish(topic=topic, payload=data)
 
 
 class mqtt_subscriber(mqtt_client):
@@ -141,40 +150,3 @@ class mqtt_subscriber(mqtt_client):
         self.client.connect(self.get_broker_addr(), 1883,60)
         self.client.subscribe(topic=self.get_subscribe_all_topic(), qos=0)
         self.client.loop_forever()
-
-    
-    
-
-# subscriptor1= mqtt_subscriber()
-
-# subscriptor1.client.connect(subscriptor1.get_broker_addr)
-
-# cliente1 = subscriptor1.create_client()
-
-
-# p1=mqtt_publisher(broker_addr="localhost", gw_name="default_gw")
-# p2=mqtt_publisher(broker_addr="localhost", gw_name="default_gw",topic_base_id="/casa/salon/0001")
-# p3=mqtt_publisher(broker_addr="localhost", gw_name="default_gw",topic_base_id="/casa/salon/0001", endpoint_id="0001")
-# p4=mqtt_subscriber(broker_addr="localhost", gw_name="default_gw",subscribe_topic="/casa")
-
-# print("pruebas 1 \n")
-# print("broker host of p1: " + p1.get_broker_addr())
-# print("publish topic of p1: " + p1.get_publish_topic())
-# print("gw name of p1: " + p1.get_gw_name())
-
-# print("pruebas 2 \n")
-# print("broker host of p2: " + p2.get_broker_addr())
-# print("publish topic of p2: " + p2.get_publish_topic())
-# print("gw name of p2: " + p2.get_gw_name())
-
-# print("pruebas 3 \n")
-# print("broker host of p3: " + p3.get_broker_addr())
-# print("publish topic of p3: " + p3.get_publish_topic())
-# print("gw name of p3: " + p3.get_gw_name())
-
-
-# print("pruebas 4 \n")
-# print("broker host of p4: " + p4.get_broker_addr())
-# print("gw name of p4: " + p4.get_gw_name())
-# print("subscribe topic of p4: " + p4.get_subscribe_topic())
-# print("subscribe topic all of p4: " + p4.get_subscribe_all_topic())

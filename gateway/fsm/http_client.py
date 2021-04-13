@@ -34,15 +34,16 @@ class http_client(object):
         return response.status
 
     def create_connection(self):
-        conn = http.client.HTTPConnection("localhost",8080, timeout=10)
+        conn = http.client.HTTPConnection(self.get_server_ip(),80, timeout=10)
         return conn
     
 
+
         
 #conn = http.client.HTTPConnection("40.114.216.24",80, timeout=10)
-# conn.request("GET", "/")
-# r1 = conn.getresponse()
-# print(r1.status, r1.reason)
+#conn.request("GET", "/")
+#r1 = conn.getresponse()
+#print(r1.status, r1.reason)
 # data1 = r1.read()
 # print(data1)
 
