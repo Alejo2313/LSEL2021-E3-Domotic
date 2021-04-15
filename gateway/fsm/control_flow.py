@@ -7,7 +7,20 @@ import time
 import json
 
 class Control_flow (object):
+    """This class contains a fsm instantiation, and clients for http and mqtt. 
+
+    Args:
+        object (object): generic object
+
+    Raises:
+        ValueError: raised when name is empty
+
+    Returns:
+        Control_flow object: object ready to process http and mqtt responses.
+    """
+
     states = ['CONFIG','IDLE','PROCESS_DATA','PROCESS_ORDER']
+
     transitions=[
         {'trigger' : 'start', 'source' : 'CONFIG',
             'dest' : 'IDLE', 'conditions' :['ready_to_work']},
@@ -28,9 +41,8 @@ class Control_flow (object):
         {'trigger' : 'data_ready', 'source' : 'PROCESS_ORDER',
             'dest' : 'IDLE', 'after':'send_data'}
     ]
-
+# Pasar al config.ini
     server_ip = "40.114.216.24"
-#    broker_ip = "192.168.1.41"
     broker_ip = "localhost"
     header_json = {"Content-type": "application/json",
         "Accept" : "text/plain"}
@@ -45,40 +57,105 @@ class Control_flow (object):
             initial = 'CONFIG', transitions=Control_flow.transitions)
         self.http_con = http_client("server",Control_flow.server_ip)
 
+
     def send_data(self):
-#        if (Control_flow.response == "1"): #Revisar 
+        """method used after the fsm arrives to destination state.
+        It launches a http request with the specified conten to the
+        server.
+        """
+
         fsm.no_need_response()
-        print("Puta")
         self.http_con.do_post("/data",
         self.msg_json,self.header_json)
-        # else:
-        #     print("Waiting for order")
-        #     time.sleep(5)
-        #     fsm.need_response()
-
         print("data sent")
         print(fsm.state)
 
     def get_name(self):
+        """getter method from retrieve object name.
+
+        Returns:
+            str: object name.
+        """
         return str(self.name)
 
     def wait(self):
+        """Waiting function.
+        """
         print("waiting")
 
     def send_order(self):
+
         print("order sent")
 
     def ready_to_work(self):
+        """Conditional function that checks if the connection with the 
+        server is OK.
+
+        Returns:
+            Bool: True if OK, else False
+        """
         res = self.http_con.do_get("/")
         print(res)
         return res == 200
 
     def msg_deliver(self):
+        """Conditional function that checks if the content sent to the server
+        has been accepted.
+
+        Returns:
+            Bool: True if OK, else False.
+        """
         return self.http_con.do_post("/data",
             json.dumps(self.msg_json),self.header_json) == 200
 
+def pack_info(gw_name, dev_id, data_type, ty, data):
+    """method that packages the information to be sent to the server
+    with specific format.
+
+    Args:
+        gw_name (String): Name of the gw
+        dev_id (String): Device identifier
+        data_type (String): data type to be casted (String = 2, Double = 1, Int = 0)
+        ty (String): sensor type
+        data (String): data received from device
+
+    Raises:
+        ValueError: [description]
+
+    Returns:
+        [type]: [description]
+    """
+    if (gw_name == "") or (dev_id == "") or (data_type == "") or (ty) or (data == ""):
+        raise ValueError("All params must be non empty")    
+    params = json.dumps(
+            {
+                "Gateway": gw_name,
+                "Devices":[
+                    {   
+                        "Device":dev_id,    
+                        "Sensors":[
+                            {
+                                "DType":data_type,
+                                "Type":ty,
+                                "data":data
+                            }
+                        ]
+
+                    }
+                ]
+            }
+        )
+    return params
+
 def on_message_suscriber(client, userdata, msg):
-    print("pm")
+    """Processes the payload and topic received and creates a JSON with
+    specific format.
+
+    Args:
+        client (client): client that sends the message.
+        userdata (userdata): data from user such as Id.
+        msg (Bytes): message sent by the client in Byte format.
+    """
     msg_payload=str(msg.payload)
     msg_topic= str(msg.topic)
     splitted_msg_topic = msg_topic.split("-")
@@ -121,38 +198,3 @@ while (True):
         sub1=mqtt_subscriber(broker_addr=Control_flow.broker_ip, gw_name="gw1234",client_id="sub",
             subscribe_topic="/home",on_msg_function = on_message_suscriber)
         sub1.sub_all_connect()
-        
-#    elif (ctrl=="2"):
-        # print("New data received: " + str(params))
-        # fsm.new_data()
-        # print(fsm.state)
-        # if (params["back"] == "0"):
-        #     fsm.no_need_response()
-        # else:
-        #     fsm.need_response()
-        #     fsm.resp_ready()
-        # print(fsm.state)
-    # elif (ctrl=="3"):
-    #     fsm.need_response()
-    #     print(fsm.state)
-    # elif (ctrl=="4"):
-    #     fsm.no_need_response()
-    #     print(fsm.state)
-    elif (ctrl=="5"):
-        fsm.resp_ready()
-        print(fsm.state)
-    elif (ctrl=="6"):
-        fsm.new_order()
-        print(fsm.state)
-    elif (ctrl=="7"):
-        fsm.need_data()
-        print(fsm.state)
-    elif (ctrl=="8"):
-        fsm.no_need_data()
-        print(fsm.state)
-    elif (ctrl=="9"):
-        fsm.data_ready()
-        print(fsm.state)
-        
-# fsm.start()
-#fsm.machine.get_graph().draw('control_fsm.png',prog='dot')
