@@ -37,25 +37,3 @@ class http_client(object):
         conn = http.client.HTTPConnection(self.get_server_ip(),80, timeout=10)
         return conn
     
-
-
-        
-#conn = http.client.HTTPConnection("40.114.216.24",80, timeout=10)
-#conn.request("GET", "/")
-#r1 = conn.getresponse()
-#print(r1.status, r1.reason)
-# data1 = r1.read()
-# print(data1)
-
-# params = {
-#     "name" : "Hello",
-#     "value": "World"
-# }
-
-# headers = {"Content-type": "application/json",
-#     "Accept" : "text/plain"}
-
-# conn.request("POST","/gateData",json.dumps(params),headers)
-# response = conn.getresponse()
-# print(response.status,response.reason)
-# conn.close()

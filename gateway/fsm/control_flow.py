@@ -164,24 +164,10 @@ def on_message_suscriber(client, userdata, msg):
     Control_flow.response = splitted_msg_topic[2]
     values = {"S":2, "D": 1, "I": 0}
     try:
-        Control_flow.msg_json = json.dumps(
-            {
-                "Gateway": fsm.get_name(),
-                "Devices":[
-                    {   
-                        "Device":device_id,    
-                        "Sensors":[
-                            {
-                                "DType":values[splitted_msg_topic[1]],
-                                "Type":splitted_msg_topic[2],
-                                "data":msg_payload.split("'")[1]
-                            }
-                        ]
-
-                    }
-                ]
-            }
-        )
+        content = pack_info(fsm.get_name(), device_id,
+        values[splitted_msg_topic[1]], splitted_msg_topic[2],
+        msg_payload.split("'")[1])
+        Control_flow.msg_json = json.dumps(content)
     except:
         print("An exception occurred. Control object might not have been created.")
     
