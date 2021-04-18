@@ -36,6 +36,32 @@ sensor_data =   {
                     "Type": 2,
                     "DType": 1,
                     "data": "5"
+                },
+                                {
+                    "Type": 3,
+                    "DType": 1,
+                    "data": "3.55"
+                },
+                {
+                    "Type": 4,
+                    "DType": 1,
+                    "data": "5"
+                }
+            ]
+        },
+        {
+            "Device":14875,
+            "Sensors":
+            [
+                {
+                    "Type": 3,
+                    "DType": 1,
+                    "data": "3.55"
+                },
+                {
+                    "Type": 4,
+                    "DType": 1,
+                    "data": "5"
                 }
             ]
         }
@@ -44,7 +70,7 @@ sensor_data =   {
 }
 
 get_data = {
-    "Gateway":"ABDCEH"
+    "Gateway":gate_UUID
 }
 
 r = session.post('http://localhost:8005/data', json=sensor_data)

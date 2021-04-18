@@ -87,6 +87,37 @@ class LogoutHandler(BaseHandler):
         self.clear_cookie("user")
         self.redirect("/")
 
+class SensorHandler(BaseHandler):
+    def get(self):
+        devId = self.get_argument("id")
+
+        if devId is None:
+            self.redirect("/")
+        
+
+        sensors = db.get_dv_sensors(devId)
+
+        for sensor in sensors:
+            sData = db.get_data(sensor["SensorID"], limit = 20)
+
+            element = {"x":[], "y":[]}
+            for ui in sData:
+                element["x"].append(str(ui["TimeStamp"]))
+                element["y"].append(ui["Data"])
+
+            sensor["data"] = element
+            print(element)
+
+        self.render('data/sensor.html', sensors=sensors, user = self.get_current_user())
+
+    def post(self):
+        devId = self.get_argument("id")
+        sensorID =  self.get_argument("sensorID")
+        data = self.get_argument("data")
+
+        db.push_request_data(SensorID = sensorID, Data = data )
+        self.redirect("/sensor?id="+str(devId))
+
 class PostDataHandler(BaseHandler):
     def check_xsrf_cookie(self): 
         pass
@@ -130,6 +161,43 @@ class PostDataHandler(BaseHandler):
             print("Gateway no found!")
 
 
+class UserGatewayHandler(BaseHandler):
+
+    def get(self):
+        user = self.get_current_user()
+        userID   = self.get_current_id()
+
+        aUsers = db.get_auth_users(userID)
+
+        gateIDs = db.get_user_gateways( userID = userID)
+        
+        gates = []
+
+        for  gID in gateIDs:
+            gate = db.get_gateway(GatewayID = gID)
+
+            if (len(gate) == 0 ):
+                return
+
+            gates.append(gate)
+
+
+        self.render('data/user.html', user = user, users = aUsers, Gateways = gates)
+
+
+    def post(self):
+        userID   = self.get_current_id()
+        nUserID = self.get_argument("UserID")
+        GatewayID = self.get_argument("GatewayID")
+
+        db.add_user_gateways(nUserID,GatewayID, userID )
+
+        self.redirect("/user")
+
+
+
+      #  db.add_user_gateways
+
 class GateWayHandler(BaseHandler):
 
     def get(self):
@@ -150,10 +218,12 @@ class GateWayHandler(BaseHandler):
                 
             userx = db.get_user(UserID = gate["AdminID"])
             gate["AdminNick"] = userx["NikName"]
-            
+
+            gate["devices"] = db.get_gw_devices(gID)
+
             gates.append(gate)
 
-        print(gates)
+
         self.render('data/Gateways.html', user = user, Gateways = gates)
 
     def post(self):
@@ -179,7 +249,9 @@ def make_app():
             (r"/logout", LogoutHandler),
             (r"/register", RegisterHandler),
             (r"/gw", GateWayHandler), 
-            (r"/data", PostDataHandler)           
+            (r"/data", PostDataHandler),
+            (r"/sensor", SensorHandler),
+            (r"/user", UserGatewayHandler),        
             ], **settings)
 
 
@@ -188,7 +260,9 @@ if __name__ == "__main__":
     
     db = QueryHandler("server", "server12345678","server_db")
     
-
+    test =  db.get_gw_devices(7)
+    
+    print(test)
     application = make_app()
     application.listen(8005)
     print('sample_app server started')

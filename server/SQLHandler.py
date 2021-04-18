@@ -121,13 +121,38 @@ class QueryHandler:
         
         return result
 
+    def get_auth_users(self, userID):
+    
+        query = """ SELECT Users.NickName, Users.UserID, Gateways.GatewayKey  
+                    FROM Users
+                    INNER JOIN UserGateways ON Users.UserID = UserGateways.UserID
+                    INNER JOIN Gateways ON Gateways.GatewayID = UserGateways.GatewayID
+
+                    WHERE Gateways.AdminID = %s AND Users.UserID != Gateways.AdminID
+               """
+        data = (userID, )
+
+        self.cursor.execute(query, data)
+
+        raw = self.cursor.fetchall()
+
+        users = []
+        for (NickName, UserID, UUID) in raw:
+            user = {
+                "NickName": NickName,
+                "UserID": UserID,
+                "UUID": UUID
+            }
+            users.append(user)
+        return users
+
     def add_user_gateways(self, userID, GatewayID, AdminID):
 
         query = "INSERT INTO UserGateways (UserID, GatewayID) VALUES (%s, %s)"
         data = (userID, GatewayID)
 
         gateway = self.get_gateway("", GatewayID = GatewayID)
-        if len(gateway) > 0 and gateway["AdminID"] == AdminID:
+        if len(gateway) > 0 and gateway["AdminID"] == int(AdminID):
             self.cursor.execute(query, data)
             self.cnx.commit()
 
@@ -164,6 +189,40 @@ class QueryHandler:
         else:
             return {}
 
+    def get_gw_devices(self, GatewayID):
+        query = "SELECT * FROM Devices WHERE GatewayID = %s"
+        data = (GatewayID,)
+        self.cursor.execute(query, data)
+        raw = self.cursor.fetchall()
+
+        devices = []
+        for (DeviceID, GatewayID, UUID) in raw:
+            dv = {
+                "DeviceID": DeviceID,
+                "GatewayID": GatewayID,
+                "UUID":UUID
+            }
+            devices.append(dv)
+
+        return devices
+
+    def get_dv_sensors(self, deviceID):
+        query = "SELECT * FROM Sensors WHERE DeviceID = %s"
+        data = (deviceID,)
+        self.cursor.execute(query, data)
+        raw = self.cursor.fetchall()
+        sensors = []
+        for (DeviceID, SensorID, Type, DataType) in raw:
+            sensor = {
+                "DeviceID": DeviceID,
+                "SensorID": SensorID,
+                "Type":     Type,
+                "DataType": DataType
+            }
+            sensors.append(sensor)
+        return sensors
+        º
+ 
     def add_device(self, GatewayID = -1, UUID = None, GatewayUUID = None):
         if GatewayUUID is not None:
             gateway = self.get_gateway(GatewayUUID)
@@ -269,31 +328,54 @@ class QueryHandler:
             }
             outData.append(element)
         
+
+        query = """UPDATE OutData 
+                
+                INNER JOIN Sensors  ON Sensors.SensorID = OutData.SensorID
+                INNER JOIN Devices  ON Devices.DeviceID = Sensors.DeviceID
+                INNER JOIN Gateways ON Gateways.GatewayID = Devices.GatewayID
+
+                SET  OutData.updated = 1
+
+                WHERE Gateways.GatewayKey = %s  AND OutData.updated = %s """ 
+
+        self.cursor.execute(query, data)
+        self.cnx.commit()
+
         return outData
     
-    def push_request_data(self, GatewayUUID, DeviceUUID, typeS, Data):
-
-        device = self.get_device(GatewayUUID = GatewayUUID, DeviceUUID= DeviceUUID)
-
-        if(len(device) == 0):
-            return
-
-        sensor = self.get_sensor(typeS= typeS, DeviceID=device["DeviceID"])
-
-        if ( len(sensor) == 0):
-            return
+    def push_request_data(self, SensorID = None, Data = 0, GatewayUUID = None , DeviceUUID = None, typeS = None):
 
         now = datetime.now()
+
+        if SensorID is None:
+            device = self.get_device(GatewayUUID = GatewayUUID, DeviceUUID= DeviceUUID)
+
+            if(len(device) == 0):
+                return
+
+            sensor = self.get_sensor(typeS= typeS, DeviceID=device["DeviceID"])
+
+            if ( len(sensor) == 0):
+                return
+            
+            SensorID = sensor["SensorID"]
+
+       
         query = "INSERT INTO OutData (SensorID, TimeStamp, Data, updated) VALUES (%s, %s, %s,%s)"
-        data  = (sensor["SensorID"],now, Data, 0 )
+        data  = (SensorID ,now, Data, 0 )
 
         self.cursor.execute(query, data)
         self.cnx.commit()
     
-    def get_data(self, sensorID, fromDate, toDate):
+    def get_data(self, sensorID, fromDate = None, toDate = None, limit= None):
     
-        query = "SELECT * FROM InData WHERE SensorID = %s AND TimeStamp BETWEEN %s AND %s"
-        data = (sensorID, fromDate, toDate)
+        if limit is not None:
+            query = "SELECT * FROM InData WHERE SensorID = %s LIMIT %s"
+            data = (sensorID, limit)
+        else:
+            query = "SELECT * FROM InData WHERE SensorID = %s AND TimeStamp BETWEEN %s AND %s"
+            data = (sensorID, fromDate, toDate)
 
         self.cursor.execute(query, data)
 
