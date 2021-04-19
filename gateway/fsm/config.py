@@ -1,12 +1,21 @@
+import os
+import json
+
+
 
 class config_read (object):
     
-    def __init__(self, path, f_name):
+    def __init__(self, path, f_name, server_ip = None, broker_ip = None,
+        header_json = None, root_topic = None):
         if (path == "" or f_name == ""):
             raise ValueError("The name of the file or path must be non empty")
         else:
             self.path = path
             self.f_name = f_name
+            self.server_ip = ""
+            self.broker_ip = ""
+            self.header_json = ""
+            self.root_topic = ""
     
 
     def get_path(self):
@@ -14,8 +23,38 @@ class config_read (object):
 
     def get_f_name(self):
         return self.f_name
+    
+    def get_server_ip(self):
+        return self.server_ip
+
+    def get_broker_ip(self):
+        return self.broker_ip
+    
+    def get_header_json(self):
+        return self.header_json
+
+    def get_root_topic(self):
+        return self.root_topic
 
     def exist(self, path, file):
+        def create_config(path, file):
+            if (os.path.isdir("./" + path) == False):
+                os.mkdir("./" + path)       
+
+            header_json_aux = {"Content-type": "application/json", "Accept" : "text/plain"}
+
+            config_file = open("./" + path + "/" + file, "w")
+            config_file.write("#config server\n")
+            config_file.write("server.ip = localhost\n")
+            config_file.write("header_json = " + json.dumps(header_json_aux))
+            config_file.write("\n")
+            config_file.write("#config mqtt\n")
+            config_file.write("broker.ip = localhost\n")
+            config_file.write("root_topic = /home\n")
+
+            exit()
+
+
         if (path == "" or file == ""):
             raise ValueError("The name of the file or path must be non empty")
         else:
@@ -32,21 +71,65 @@ class config_read (object):
 
             if (file.find(".ini") != -1):
                 loc = "." + str(c2_path + file)
-                print(loc)
             else:
                 raise ValueError("File to be read is not .ini file")
 
             try:
                 f = open(loc)
             except IOError:
-                print("File doesn't exist in specified path: " + loc)
+                print("Creating config.ini on specified file: " + loc)
+                create_config(path, file)
                 return False
             finally:
-                f.close()
                 return True
 
+    def read_config(self, path, file):
+        
+        def parse_server_params(file_list, pos):
+            res = ["", ""]
+            for j in range(pos + 1, pos + 3):
+                aux = file_list[j].split("=")
+                if (aux[0] == "" or aux[1] == ""):
+                    raise ValueError("Param or value must be non empty")
+                elif (aux[0] == "server.ip "):
+                    res[0] = aux[1][1:len(aux[1])-1]
+                elif (aux[0] == "header_json "):
+                    res[1] = aux[1][1:len(aux[1]) - 1]
+                else:
+                    raise ValueError("Param not valid")
+            return res
 
-    
+        def parse_mqtt_params(file_list, pos):
+            res = ["", ""]
+            for j in range(pos + 1, pos + 3):
+                aux = file_list[j].split("=")
+                if (aux[0] == "" or aux[1] == ""):
+                    raise ValueError("Param or value must be non empty")
+                elif (aux[0] == "broker.ip "):
+                    res[0] = aux[1][1:len(aux[1])-1]
+                elif (aux[0] == "root_topic "):
+                    res[1] = aux[1][1:len(aux[1]) - 1]
+                else:
+                    raise ValueError("Param not valid")
+            return res
+                
 
-test_exist = config_read("/config/", "config.ini")
-test_exist.exist("config//", "config.ini")
+        if (path == "" or file == ""):
+            raise ValueError("The name of the file or path must be non empty")
+        else:
+            if self.exist(path,file):
+                with open("./" + path + "/" + file, "r") as f_config:
+                    config_list = list(f_config)
+                
+                for i in config_list:
+                    if(i == "#config server\n"):
+                        server_params = parse_server_params(config_list, config_list.index(i))
+                        self.server_ip = server_params[0]
+                        self.header_json = server_params[1]
+                    elif (i == "#config mqtt\n"):
+                        mqtt_params = parse_mqtt_params(config_list, config_list.index(i))
+                        self.broker_ip = mqtt_params[0]
+                        self.root_topic = mqtt_params[1]
+
+                        
+

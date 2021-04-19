@@ -2,6 +2,7 @@ from transitions.extensions import GraphMachine as Machine
 from http_client import http_client
 from lsel_mqttclient import mqtt_publisher
 from lsel_mqttclient import mqtt_subscriber
+from config import config_read
 import sys
 import time
 import json
@@ -41,15 +42,24 @@ class Control_flow (object):
         {'trigger' : 'data_ready', 'source' : 'PROCESS_ORDER',
             'dest' : 'IDLE', 'after':'send_data'}
     ]
-# Pasar al config.ini
-    server_ip = "40.114.216.24"
-    broker_ip = "localhost"
+
+
+    config_params = config_read("/config/", "config.ini")
+
+    config_params.read_config("config", "config.ini")
+
+    broker_ip = config_params.get_broker_ip()
+    server_ip = config_params.get_server_ip()
+    header_json = config_params.get_header_json()
+    print(header_json)
     header_json = {"Content-type": "application/json",
         "Accept" : "text/plain"}
+    root_topic = str(config_params.get_root_topic())
+
     response = ""
     msg_json = ""
     
-    def __init__(self,name):
+    def __init__(self, name):
         if name == "":
             raise ValueError("The name of the control flow must be non empty")
         self.name = name
@@ -77,6 +87,7 @@ class Control_flow (object):
             str: object name.
         """
         return str(self.name)
+    
 
     def wait(self):
         """Waiting function.
@@ -126,7 +137,8 @@ def pack_info(gw_name, dev_id, data_type, ty, data):
         [type]: [description]
     """
     if (gw_name == "") or (dev_id == "") or (data_type == "") or (ty) or (data == ""):
-        raise ValueError("All params must be non empty")    
+        raise ValueError("All params must be non empty")
+    print("puta")
     params = json.dumps(
             {
                 "Gateway": gw_name,
@@ -177,10 +189,11 @@ def on_message_suscriber(client, userdata, msg):
 fsm = Control_flow("gw1234")
 
 while (True):
+    print(fsm.root_topic)
     ctrl=input("Insert key:")
     if (ctrl=="1"):
         fsm.start()
         print(fsm.state)
         sub1=mqtt_subscriber(broker_addr=Control_flow.broker_ip, gw_name="gw1234",client_id="sub",
-            subscribe_topic="/home",on_msg_function = on_message_suscriber)
+            subscribe_topic=fsm.root_topic,on_msg_function = on_message_suscriber)
         sub1.sub_all_connect()
