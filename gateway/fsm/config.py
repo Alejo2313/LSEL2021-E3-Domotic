@@ -2,7 +2,6 @@ import os
 import json
 
 
-
 class config_read (object):
     
     def __init__(self, path, f_name, server_ip = None, broker_ip = None,
@@ -40,7 +39,6 @@ class config_read (object):
         def create_config(path, file):
             if (os.path.isdir("./" + path) == False):
                 os.mkdir("./" + path)       
-
             header_json_aux = {"Content-type": "application/json", "Accept" : "text/plain"}
 
             config_file = open("./" + path + "/" + file, "w")
@@ -51,8 +49,7 @@ class config_read (object):
             config_file.write("#config mqtt\n")
             config_file.write("broker.ip = localhost\n")
             config_file.write("root_topic = /home\n")
-
-            exit()
+            config_file.close()
 
 
         if (path == "" or file == ""):
@@ -88,13 +85,14 @@ class config_read (object):
         def parse_server_params(file_list, pos):
             res = ["", ""]
             for j in range(pos + 1, pos + 3):
-                aux = file_list[j].split("=")
+                aux = file_list[j].replace(" ", "")
+                aux = aux.split("=")
                 if (aux[0] == "" or aux[1] == ""):
                     raise ValueError("Param or value must be non empty")
-                elif (aux[0] == "server.ip "):
-                    res[0] = aux[1][1:len(aux[1])-1]
-                elif (aux[0] == "header_json "):
-                    res[1] = aux[1][1:len(aux[1]) - 1]
+                elif (aux[0] == "server.ip"):
+                    res[0] = aux[1]
+                elif (aux[0] == "header_json"):
+                    res[1] = aux[1]
                 else:
                     raise ValueError("Param not valid")
             return res
@@ -102,13 +100,14 @@ class config_read (object):
         def parse_mqtt_params(file_list, pos):
             res = ["", ""]
             for j in range(pos + 1, pos + 3):
-                aux = file_list[j].split("=")
+                aux = file_list[j].replace(" ", "")
+                aux = aux.split("=")
                 if (aux[0] == "" or aux[1] == ""):
                     raise ValueError("Param or value must be non empty")
-                elif (aux[0] == "broker.ip "):
-                    res[0] = aux[1][1:len(aux[1])-1]
-                elif (aux[0] == "root_topic "):
-                    res[1] = aux[1][1:len(aux[1]) - 1]
+                elif (aux[0] == "broker.ip"):
+                    res[0] = aux[1]
+                elif (aux[0] == "root_topic"):
+                    res[1] = aux[1]
                 else:
                     raise ValueError("Param not valid")
             return res
@@ -124,12 +123,18 @@ class config_read (object):
                 for i in config_list:
                     if(i == "#config server\n"):
                         server_params = parse_server_params(config_list, config_list.index(i))
-                        self.server_ip = server_params[0]
-                        self.header_json = server_params[1]
+                        self.server_ip = server_params[0].replace("\n","")
+                        self.header_json = server_params[1].replace("\n","")
+#                        print("server IP: " + (self.get_server_ip()))
+#                        print("header json: " + self.get_header_json())
                     elif (i == "#config mqtt\n"):
                         mqtt_params = parse_mqtt_params(config_list, config_list.index(i))
-                        self.broker_ip = mqtt_params[0]
-                        self.root_topic = mqtt_params[1]
+                        self.broker_ip = mqtt_params[0].replace("\n","")
+                        self.root_topic = mqtt_params[1].replace("\n","")
+#                        print("Broker IP: " + self.get_broker_ip())
+#                        print("Root topic: " + self.get_root_topic())
 
+prueba = config_read("config" , "config.ini")
+prueba.read_config(prueba.get_path(), prueba.get_f_name())
                         
 

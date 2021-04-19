@@ -44,18 +44,14 @@ class Control_flow (object):
     ]
 
 
-    config_params = config_read("/config/", "config.ini")
+    config_params = config_read("config", "config.ini")
 
-    config_params.read_config("config", "config.ini")
+    config_params.read_config(config_params.get_path(), config_params.get_f_name())
 
     broker_ip = config_params.get_broker_ip()
     server_ip = config_params.get_server_ip()
-    header_json = config_params.get_header_json()
-    print(header_json)
-    header_json = {"Content-type": "application/json",
-        "Accept" : "text/plain"}
-    root_topic = str(config_params.get_root_topic())
-
+    header_json = json.loads(config_params.get_header_json())
+    root_topic = config_params.get_root_topic()
     response = ""
     msg_json = ""
     
@@ -136,9 +132,8 @@ def pack_info(gw_name, dev_id, data_type, ty, data):
     Returns:
         [type]: [description]
     """
-    if (gw_name == "") or (dev_id == "") or (data_type == "") or (ty) or (data == ""):
+    if (gw_name == "") or (dev_id == "") or (data_type == "") or (ty == "") or (data == ""):
         raise ValueError("All params must be non empty")
-    print("puta")
     params = json.dumps(
             {
                 "Gateway": gw_name,
@@ -179,21 +174,26 @@ def on_message_suscriber(client, userdata, msg):
         content = pack_info(fsm.get_name(), device_id,
         values[splitted_msg_topic[1]], splitted_msg_topic[2],
         msg_payload.split("'")[1])
+
         Control_flow.msg_json = json.dumps(content)
     except:
         print("An exception occurred. Control object might not have been created.")
+        print(Control_flow.msg_json)
+        exit()
     
     print("JSON to send:\n"+Control_flow.msg_json)
     fsm.new_data()
 
 fsm = Control_flow("gw1234")
-
+print(fsm.broker_ip)
+print(fsm.server_ip)
+print(fsm.header_json)
+print(fsm.root_topic)
 while (True):
-    print(fsm.root_topic)
     ctrl=input("Insert key:")
     if (ctrl=="1"):
         fsm.start()
         print(fsm.state)
-        sub1=mqtt_subscriber(broker_addr=Control_flow.broker_ip, gw_name="gw1234",client_id="sub",
+        sub1=mqtt_subscriber(broker_addr=fsm.broker_ip, gw_name="gw1234",client_id="sub",
             subscribe_topic=fsm.root_topic,on_msg_function = on_message_suscriber)
         sub1.sub_all_connect()
