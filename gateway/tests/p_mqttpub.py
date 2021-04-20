@@ -4,4 +4,4 @@ import sys
 brokerAddress = "localhost"
 pub1=mqtt_publisher(broker_addr=brokerAddress, gw_name="gw",client_id="pub")
 
-pub1.publish_msg("/home/salon/0001","S","1","I","alejocagaduro")
+pub1.publish_msg("/home/salon/0001","S","1","I","lselKing")

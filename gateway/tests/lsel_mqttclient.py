@@ -147,9 +147,10 @@ class mqtt_subscriber(mqtt_client):
     def sub_all_connect(self):
         """[function that subscribes to all the hanging topics from the base topic]
         """
-        self.client.connect(self.get_broker_addr(), 1883,60)
+        self.client.connect_async(self.get_broker_addr(), 1883,60)
         self.client.subscribe(topic=self.get_subscribe_all_topic(), qos=0)
-        self.client.loop_forever()
+        self.client.loop_start()
+#        self.client.loop_forever()
 
     
     

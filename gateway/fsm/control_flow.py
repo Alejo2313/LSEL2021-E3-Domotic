@@ -6,6 +6,7 @@ from config import config_read
 import sys
 import time
 import json
+import time
 
 class Control_flow (object):
     """This class contains a fsm instantiation, and clients for http and mqtt. 
@@ -54,6 +55,7 @@ class Control_flow (object):
     root_topic = config_params.get_root_topic()
     response = ""
     msg_json = ""
+    t_ref = time.time()
     
     def __init__(self, name):
         if name == "":
@@ -75,6 +77,12 @@ class Control_flow (object):
         self.msg_json,self.header_json)
         print("data sent")
         print(fsm.state)
+        t_init = time.time()    
+        if (t_init - self.t_ref > 5):
+            self.t_ref = time.time()
+            fsm.new_order()
+            print(fsm.state)
+
 
     def get_name(self):
         """getter method from retrieve object name.
@@ -93,6 +101,7 @@ class Control_flow (object):
     def send_order(self):
 
         print("order sent")
+        fsm.no_need_data()
 
     def ready_to_work(self):
         """Conditional function that checks if the connection with the 
@@ -124,7 +133,7 @@ def pack_info(gw_name, dev_id, data_type, ty, data):
         dev_id (String): Device identifier
         data_type (String): data type to be casted (String = 2, Double = 1, Int = 0)
         ty (String): sensor type
-        data (String): data received from device
+        data (Object): data received from device
 
     Raises:
         ValueError: [description]
@@ -132,10 +141,9 @@ def pack_info(gw_name, dev_id, data_type, ty, data):
     Returns:
         [type]: [description]
     """
-    if (gw_name == "") or (dev_id == "") or (data_type == "") or (ty == "") or (data == ""):
+    if (gw_name == "") or (dev_id == "") or (data_type == "") or (ty == "") or (data == None):
         raise ValueError("All params must be non empty")
-    params = json.dumps(
-            {
+    params = {
                 "Gateway": gw_name,
                 "Devices":[
                     {   
@@ -151,7 +159,6 @@ def pack_info(gw_name, dev_id, data_type, ty, data):
                     }
                 ]
             }
-        )
     return params
 
 def on_message_suscriber(client, userdata, msg):
@@ -171,6 +178,7 @@ def on_message_suscriber(client, userdata, msg):
     Control_flow.response = splitted_msg_topic[2]
     values = {"S":2, "D": 1, "I": 0}
     try:
+        t_init = time.time()
         content = pack_info(fsm.get_name(), device_id,
         values[splitted_msg_topic[1]], splitted_msg_topic[2],
         msg_payload.split("'")[1])
@@ -184,16 +192,30 @@ def on_message_suscriber(client, userdata, msg):
     print("JSON to send:\n"+Control_flow.msg_json)
     fsm.new_data()
 
-fsm = Control_flow("gw1234")
+def delay5s(t1, t2):
+    if (t2 - t1 > 5):
+        print("arrived")
+        t1 = time.time()
+        fsm.new_order()
+    else:
+        t2 = time.time()
+        print(str(t2-t1))
+
+fsm = Control_flow("gw_temp")
 print(fsm.broker_ip)
 print(fsm.server_ip)
 print(fsm.header_json)
 print(fsm.root_topic)
+
+t1 = time.time()
+t2 = time.time()
+valid = 0
 while (True):
     ctrl=input("Insert key:")
     if (ctrl=="1"):
         fsm.start()
         print(fsm.state)
-        sub1=mqtt_subscriber(broker_addr=fsm.broker_ip, gw_name="gw1234",client_id="sub",
+        valid = 1
+        sub1=mqtt_subscriber(broker_addr=fsm.broker_ip, gw_name="gw_temp",client_id="sub",
             subscribe_topic=fsm.root_topic,on_msg_function = on_message_suscriber)
         sub1.sub_all_connect()
