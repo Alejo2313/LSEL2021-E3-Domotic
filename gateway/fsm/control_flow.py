@@ -77,11 +77,6 @@ class Control_flow (object):
         self.msg_json,self.header_json)
         print("data sent")
         print(fsm.state)
-        t_init = time.time()    
-        if (t_init - self.t_ref > 5):
-            self.t_ref = time.time()
-            fsm.new_order()
-            print(fsm.state)
 
 
     def get_name(self):
@@ -123,6 +118,7 @@ class Control_flow (object):
         """
         return self.http_con.do_post("/data",
             json.dumps(self.msg_json),self.header_json) == 200
+
 
 def pack_info(gw_name, dev_id, data_type, ty, data):
     """method that packages the information to be sent to the server
