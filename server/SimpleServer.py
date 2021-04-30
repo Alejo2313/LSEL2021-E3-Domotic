@@ -18,7 +18,9 @@ class BaseHandler(tornado.web.RequestHandler):
 
     def get_current_user(self):
         self.set_current_session()
-        return self.get_secure_cookie("user")
+
+        user = {"name": self.get_secure_cookie("user"), "id": self.get_secure_cookie("id")}
+        return user
 
     def get_current_id(self):
         self.set_current_session()
@@ -85,6 +87,7 @@ class LogoutHandler(BaseHandler):
     @tornado.web.authenticated
     def get(self):
         self.clear_cookie("user")
+        self.clear_cookie("id")
         self.redirect("/")
 
 class SensorHandler(BaseHandler):

@@ -5,8 +5,6 @@
     <div class="w3-container">
         <h5>Gateways</h5>
         {% for usr in users %}
-
-
         <div class="w3-cell-row w3-striped w3-bordered w3-border accordion w3-white">
           <div class="w3-container w3-third w3-cell">
             <p>{{ usr['NickName'] }}</p>
@@ -20,10 +18,7 @@
             <p>{{ usr['UUID'] }}</p>
           </div>
         </div>
-
         {% end %}
-
-
         <form class="w3-container" method='POST' >
             <br>Authorize new user:</br>
             <div class="w3-section">
@@ -35,7 +30,6 @@
                     <option value="{{Gateway['GatewayID']}}">{{ Gateway['UUID'] }}</option>
                     {% end %}
                 </select>
-            
             </div>
               {% raw xsrf_form_html() %}
               <div class="w3-third">
@@ -44,10 +38,7 @@
               
             </div>
           </form>
-
     </div>
 </div>
-
-
 
   {% include "Footer.html" %}

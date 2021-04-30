@@ -25,12 +25,13 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
       <img src="/w3images/avatar2.png" class="w3-circle w3-margin-right" style="width:46px">
     </div>
     <div class="w3-col s8 w3-bar">
-      {% if not user %}
+      {% if user["name"] == None or  user["id"] == None%}
 
       <span>Please, <a href="/login">login</a> or <a href="/register">register</a></span><br>
 
       {% else %}
-      <span>Welcome, <strong>{{ user }}</strong></span><br>
+      <span>Welcome, <strong>{{ user["name"] }}</strong></span><br>
+      <span>Your ID is <strong>{{ user["id"] }}</strong></span><br>
       <spam><a href="/logout">Logout</a></spam>
 
       {% end %}
