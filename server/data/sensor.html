@@ -57,7 +57,7 @@
         </div>
 
         <div class="panel">
-            {% if sensor['Type'] == 1 or sensor['Type'] == 2  %}
+            {% if sensor['Type'] == 3 or sensor['Type'] == 4 or  sensor['Type'] == 5 %}
 
 
             <div id="graph-{{sensor['SensorID']}}" style="width:600px;height:250px;"></div>
@@ -71,7 +71,7 @@
             </script>
             {% end %}
             
-            {% if sensor['Type'] == 4 %}
+            {% if sensor['Type'] == 2 %}
 
             <form action="/sensor" method="POST">
                 <label for="favcolor">Select your favorite color:</label>
@@ -83,7 +83,7 @@
             </form>
             {% end %}
 
-            {% if sensor['Type'] == 3 %}
+            {% if sensor['Type'] == 0 %}
             
             <form action="/sensor" method="POST">
               {% raw xsrf_form_html() %}
