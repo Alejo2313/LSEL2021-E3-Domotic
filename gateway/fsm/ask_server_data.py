@@ -7,6 +7,10 @@ import sys
 import time
 import json
 import time
+import requests
+import paho.mqtt.client as mqtt
+
+session = requests.Session()
 
 class ask_data (object):
     """This class contains a fsm instantiation, and clients for http and mqtt. 
@@ -26,8 +30,8 @@ class ask_data (object):
     transitions=[
         {'trigger' : 'start', 'source' : 'IDLE',
             'dest' : 'START', 'conditions' :['ready_to_work']},
-        {'trigger' : 'check_timeout', 'source' : 'START',
-            'dest' : 'PROCESSING', 'conditions':['check_data'], 
+        {'trigger' : 'tout', 'source' : 'START',
+            'dest' : 'PROCESSING', 'conditions':['check_tout'], 
             'after' : 'process_data'},        
         {'trigger' : 'is_processed', 'source' : 'PROCESSING',
             'dest' : 'START', 'conditions':['data_processed'], 
@@ -57,11 +61,16 @@ class ask_data (object):
         self.http_con = http_client("server",ask_data.server_ip)
 
 
-    def check_data(self):
+    def check_tout(self):
+        """Checks if time elapsed
+
+        Returns:
+            Boolean: True if elapsed, else False
+        """
         
-        if (self.t_init - self.t_ref > 5):
+        if (self.t_init - self.t_ref > 0.25):
             self.t_ref = time.time()
-            print("Data checked")
+            print("Time elapsed")
             print(fsm.state)
             return True
         else:
@@ -80,6 +89,17 @@ class ask_data (object):
 
     def process_data(self):
         print("Data processed")
+#        res = json.loads(self.get_content().decode('utf-8'))
+        res = self.get_content()
+        if (len(res) == 0):
+            print("Nothing to do")
+        else:
+            for data in res:
+                print(data)
+                if (data["SensorType"] == 2):
+                    self.prepare_msg(fsm.root_topic,data["Device"],data["SensorType"],str(int(data["Data"][1:],16)))
+                else:
+                    self.prepare_msg(fsm.root_topic,data["Device"],data["SensorType"],data["Data"])
         fsm.is_processed()
 
     def data_processed(self):
@@ -98,12 +118,28 @@ class ask_data (object):
         Returns:
             Bool: True if OK, else False
         """
-        res = self.http_con.do_get("/")
+        res = self.http_con.do_get_status("/")
         print(res)
         return res == 200
 
+    def get_content(self):
+        gw_id = {
+            "Gateway" : "poc1"
+        }
+        r = session.get('http://40.114.216.24:80/data', json=gw_id)
+        print(r.status_code)
+        print(r.json())
+        return r.json()
 
-fsm = ask_data("gw_temp")
+    def prepare_msg(self, base_id, dev_id, dev_ty, pld):
+#        topic = base_id + "/" dev_id + "-I" + "-" + str(dev_ty) + "-O"
+        client= mqtt.Client(client_id="tpm")
+        client.connect(fsm.broker_ip, 1883,60)
+        topic= base_id + "/" + dev_id + "-I" + "-" + str(dev_ty) + "-O"
+        print(topic)
+        client.publish(topic=topic, payload=pld)
+
+fsm = ask_data("poc1")
 initialize = 0
 
 while (True):
@@ -115,6 +151,6 @@ while (True):
             print(fsm.state)
             initialize = 1
 
-    fsm.check_timeout()
+    fsm.tout()
     
         

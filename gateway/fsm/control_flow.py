@@ -105,7 +105,7 @@ class Control_flow (object):
         Returns:
             Bool: True if OK, else False
         """
-        res = self.http_con.do_get("/")
+        res = self.http_con.do_get_status("/")
         print(res)
         return res == 200
 
@@ -197,7 +197,7 @@ def delay5s(t1, t2):
         t2 = time.time()
         print(str(t2-t1))
 
-fsm = Control_flow("gw_temp")
+fsm = Control_flow("poc1")
 print(fsm.broker_ip)
 print(fsm.server_ip)
 print(fsm.header_json)

@@ -14,7 +14,7 @@ class http_client(object):
     def get_server_ip(self):
         return self.server_ip
     
-    def do_get(self,path):
+    def do_get_status(self,path):
         if (path == ""):
             raise ValueError("Path value in do_get function must be non empty")
         conn = self.create_connection()
@@ -22,6 +22,14 @@ class http_client(object):
         r1 = conn.getresponse()
         return r1.status
     
+    def do_get(self,path, body):
+        if (path == ""):
+            raise ValueError("Path value in do_get function must be non empty")
+        conn = self.create_connection()
+        conn.request("GET",path, body = body)   
+        r1 = conn.getresponse()
+        return r1.status
+
     def do_post(self,path,params, headers):
         if (path == ""):
             raise ValueError("Path value in do_post function must be non empty")
