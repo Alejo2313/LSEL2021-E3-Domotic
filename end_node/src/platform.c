@@ -681,8 +681,12 @@ void load_data()
     if(save == 1)
     {
         save_data();
+        ESP_LOGI(TAG, "Saving %s %s .", wifi_ssid, wifi_password);
     }
-    
+    else
+    {
+        ESP_LOGI(TAG, "Loaded %s %s .", wifi_ssid, wifi_password);
+    }
 }
 
 void save_data()

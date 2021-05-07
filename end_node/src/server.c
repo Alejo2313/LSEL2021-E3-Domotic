@@ -75,6 +75,7 @@ static esp_err_t config_get_handler(httpd_req_t *req)
         }
         free(buf);
         CLEAR_FLAGS(&flags,FLAGS_ALL);
+        save_data();
         stop_webserver();
 
         
