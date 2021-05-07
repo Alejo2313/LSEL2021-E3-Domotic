@@ -371,7 +371,7 @@ class QueryHandler:
     def get_data(self, sensorID, fromDate = None, toDate = None, limit= None):
     
         if limit is not None:
-            query = "SELECT * FROM InData WHERE SensorID = %s LIMIT %s"
+            query = "SELECT * FROM InData WHERE SensorID = %s  ORDER BY time(TimeStamp) LIMIT %s "
             data = (sensorID, limit)
         else:
             query = "SELECT * FROM InData WHERE SensorID = %s AND TimeStamp BETWEEN %s AND %s"
