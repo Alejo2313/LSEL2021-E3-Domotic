@@ -52,7 +52,7 @@ CREATE TABLE `OutData` (
     `SensorID` int  NOT NULL ,
     `TimeStamp` time  NOT NULL ,
     `Data` TEXT  NOT NULL ,
-    `uptimed` int NOT NULL
+    `updated` int NOT NULL
 );
 
 ALTER TABLE `UserGateways` ADD CONSTRAINT `fk_UserGateways_UserID` FOREIGN KEY(`UserID`)

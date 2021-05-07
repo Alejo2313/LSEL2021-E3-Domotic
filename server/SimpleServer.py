@@ -235,7 +235,7 @@ class GateWayHandler(BaseHandler):
 
         gateUUID = self.get_argument("UUID")
 
-
+        print("addd gateway")
         db.add_gateway(userID = userID, UUID = gateUUID )
         self.redirect("/gw")
 
@@ -261,12 +261,12 @@ def make_app():
 if __name__ == "__main__":
 
     
-    db = QueryHandler("server", "server12345678","server_db")
+    db = QueryHandler("server", "server12345678","domotic")
     
     test =  db.get_gw_devices(7)
     
     print(test)
     application = make_app()
-    application.listen(8005)
+    application.listen(80)
     print('sample_app server started')
     tornado.ioloop.IOLoop.instance().start()
