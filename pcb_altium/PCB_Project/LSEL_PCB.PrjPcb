@@ -329,6 +329,10 @@ DItemRevisionGUID=
 GenerateClassCluster=0
 DocumentUniqueId=LJEHYIFA
 
+[GeneratedDocument1]
+DocumentPath=Project Outputs for LSEL_PCB\Design Rule Check - LSEL_PCB.html
+DItemRevisionGUID=
+
 [Parameter1]
 Name=Project
 Value=LSEL PCB
