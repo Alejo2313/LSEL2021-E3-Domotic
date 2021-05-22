@@ -207,6 +207,7 @@ class QueryHandler:
         return devices
 
     def get_dv_sensors(self, deviceID):
+        names = ["BUTTOM", "ALARM ","RGB LED","TEMPERATURE", "HUMIDITY", "PRESURE" ]
         query = "SELECT * FROM Sensors WHERE DeviceID = %s"
         data = (deviceID,)
         self.cursor.execute(query, data)
@@ -216,7 +217,7 @@ class QueryHandler:
             sensor = {
                 "DeviceID": DeviceID,
                 "SensorID": SensorID,
-                "Type":     Type,
+                "Type":     names[Type],
                 "DataType": DataType
             }
             sensors.append(sensor)

@@ -43,7 +43,7 @@ class LoginHandler(BaseHandler):
 
     def get(self):
         user = self.get_current_user()
-        self.render('data/Login.html', user=user)
+        self.render('data/Login.html', user=user, page = 3)
 
     def post(self):
         
@@ -62,7 +62,7 @@ class RegisterHandler(BaseHandler):
     
     def get(self):
         user = self.get_current_user()
-        self.render('data/Register.html', user=user)
+        self.render('data/Register.html', user=user, page = 4)
 
     def post(self):
         user = self.get_argument("user")
@@ -80,7 +80,7 @@ class IndexHandler(BaseHandler):
         user = self.get_current_user()
         print('getting current user in IndexHandler', self.get_current_user()) 
 
-        self.render('data/index.html', user=user)              
+        self.render('data/index.html', user=user, page = 0)              
 
 class LogoutHandler(BaseHandler):
 
@@ -111,7 +111,7 @@ class SensorHandler(BaseHandler):
             sensor["data"] = element
             print(element)
 
-        self.render('data/sensor.html', sensors=sensors, user = self.get_current_user())
+        self.render('data/sensor.html', sensors=sensors, user = self.get_current_user(), page = 5)
 
     def post(self):
         devId = self.get_argument("id")
@@ -185,7 +185,7 @@ class UserGatewayHandler(BaseHandler):
             gates.append(gate)
 
 
-        self.render('data/user.html', user = user, users = aUsers, Gateways = gates)
+        self.render('data/user.html', user = user, users = aUsers, Gateways = gates, page = 2)
 
 
     def post(self):
@@ -208,7 +208,7 @@ class GateWayHandler(BaseHandler):
         userID   = self.get_current_id()
 
         if (user is None):
-            self.render('data/index.html', user = user)
+            self.render('data/index.html', user = user, page = 0)
 
         gateIDs = db.get_user_gateways( userID = userID)
         
@@ -227,7 +227,7 @@ class GateWayHandler(BaseHandler):
             gates.append(gate)
 
 
-        self.render('data/Gateways.html', user = user, Gateways = gates)
+        self.render('data/Gateways.html', user = user, Gateways = gates, page = 1)
 
     def post(self):
         user = self.get_current_user()
@@ -254,14 +254,17 @@ def make_app():
             (r"/gw", GateWayHandler), 
             (r"/data", PostDataHandler),
             (r"/sensor", SensorHandler),
-            (r"/user", UserGatewayHandler),        
+            (r"/user", UserGatewayHandler),   
+            (r"/img/(.*)", tornado.web.StaticFileHandler, {
+                "path": "./data/img"
+            }),        
             ], **settings)
 
 
 if __name__ == "__main__":
 
     
-    db = QueryHandler("server", "server12345678","domotic")
+    db = QueryHandler("server", "server12345678","server_db")
     
     test =  db.get_gw_devices(7)
     
