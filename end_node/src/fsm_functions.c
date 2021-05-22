@@ -312,6 +312,10 @@ void processData(fsm_t* this)
 
   case TURN_ALARM:
     tmp = atoi(data);
+
+    if( tmp > 0x00FFFFFF)
+      break;
+
     if (tmp > 0)
     {
       SET_FLAGS(fsm->data.flags, ALARM_ON);
@@ -323,7 +327,11 @@ void processData(fsm_t* this)
     break;
 
   case COLOR_LED:
+  
     tmp = atoi(data);
+
+    if( tmp > 0x00FFFFFF)
+      break;
 
     SET_FLAGS(fsm->data.flags, LED_COLOR);
     
@@ -363,6 +371,12 @@ void publishData(fsm_t* this)
   len = sprintf(data, "%d", fsm->data.sensorData->temp);
   fsm->interface.sendData(SENSOR_TEMP, data, len);
   fsm->interface.delayMs(10);
+
+
+  len = sprintf(data, "%d", 0xFF000000);
+  fsm->interface.sendData(TURN_LED, data, len);
+  fsm->interface.sendData(COLOR_LED, data, len);
+
 }
 
 
