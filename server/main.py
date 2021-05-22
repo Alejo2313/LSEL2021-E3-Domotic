@@ -92,6 +92,7 @@ class LogoutHandler(BaseHandler):
 
 class SensorHandler(BaseHandler):
     def get(self):
+        names = ["BUTTOM", "ALARM ","RGB LED","TEMPERATURE", "HUMIDITY", "PRESURE" ]
         devId = self.get_argument("id")
 
         if devId is None:
@@ -111,7 +112,7 @@ class SensorHandler(BaseHandler):
             sensor["data"] = element
             print(element)
 
-        self.render('data/sensor.html', sensors=sensors, user = self.get_current_user(), page = 5)
+        self.render('data/sensor.html', sensors=sensors, user = self.get_current_user(), page = 5, names = names)
 
     def post(self):
         devId = self.get_argument("id")
@@ -264,7 +265,7 @@ def make_app():
 if __name__ == "__main__":
 
     
-    db = QueryHandler("server", "server12345678","server_db")
+    db = QueryHandler("server", "server12345678","domotic")
     
     test =  db.get_gw_devices(7)
     
