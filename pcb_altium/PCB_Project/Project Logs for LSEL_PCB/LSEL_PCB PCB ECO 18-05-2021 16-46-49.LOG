@@ -1,0 +1,4 @@
+Removed Pin From Net: NetName=NetR42_1 Pin=ESP32-13
+Removed Pin From Net: NetName=NetR41_1 Pin=ESP32-14
+Added Pin To Net: NetName=NetR41_1 Pin=ESP32-13
+Added Pin To Net: NetName=NetR42_1 Pin=ESP32-14

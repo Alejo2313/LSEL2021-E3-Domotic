@@ -1,0 +1,3 @@
+Layer Pairs Export File for PCB: C:\Users\marcos\Desktop\LSEL\LSEL_Altium_Library\Project Outputs for LSEL_Library\LSEL_PCB.PcbDoc
+LayersSetName=Top_Bot_Thru_Holes|DrillFile=lsel_pcb.txt|DrillLayers=gtl,gp1,gp2,gbl
+LayersSetName=Top_Bot_Rect_Holes|DrillFile=lsel_pcb-rectholes.txt|DrillLayers=gtl,gp1,gp2,gbl

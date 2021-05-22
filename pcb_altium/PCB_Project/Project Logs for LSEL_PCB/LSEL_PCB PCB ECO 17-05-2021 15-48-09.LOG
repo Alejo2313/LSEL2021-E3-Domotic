@@ -1,0 +1,18 @@
+Removed Pin From Net: NetName=NetC24_1 Pin=C24-1
+Change Component Footprint: Designator=C21 Old Footprint=1206C-GENERIC New Footprint=0603C-GENERIC
+Change Component Footprint: Designator=C22 Old Footprint=1206C-GENERIC New Footprint=0603C-GENERIC
+Change Component Footprint: Designator=C23 Old Footprint=1206C-GENERIC New Footprint=0603C-GENERIC
+Change Component Footprint: Designator=C24 Old Footprint=1206C-GENERIC New Footprint=0603C-GENERIC
+Change Component Comment : Designator=C23 Old Comment=2.2 nF New Comment=2.2nF
+Change Component Comment : Designator=C24 Old Comment=10 nF New Comment=10nF
+Change Component Comment : Designator=C21 Old Comment=10 uF New Comment=10uF
+Change Component Comment : Designator=C22 Old Comment=22 uF New Comment=22uF
+Change component parameters: Designator = "C21" ("C21"); Footprint = "1206C-GENERIC"; UniqueID = "\XFNNTPIJ\DODXIPWR" ("\XFNNTPIJ\DODXIPWR")
+Change component parameters: Designator = "C22" ("C22"); Footprint = "1206C-GENERIC"; UniqueID = "\XFNNTPIJ\HLYBBMUO" ("\XFNNTPIJ\HLYBBMUO")
+Change component parameters: Designator = "C23" ("C23"); Footprint = "1206C-GENERIC"; UniqueID = "\XFNNTPIJ\OTKFJIAR" ("\XFNNTPIJ\OTKFJIAR")
+Change component parameters: Designator = "C24" ("C24"); Footprint = "1206C-GENERIC"; UniqueID = "\XFNNTPIJ\VFHANKOT" ("\XFNNTPIJ\VFHANKOT")
+Added Pin To Net: NetName=NetC24_1 Pin=C24-2
+Change Net Name : Old Net Name=NetC24_1 New Net Name=NetC24_2
+Added Pin To Net: NetName=NetC24_1 Pin=C24-1
+Added Pin To Net: NetName=NetC24_1 Pin=U1-1
+Added Net: Name=NetC24_1
