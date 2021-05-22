@@ -1,0 +1,44 @@
+{% include "Header.html" %}
+
+
+<div class="w3-main" style="margin-left:300px;margin-top:43px;">
+    <div class="w3-container">
+        <h5>Gateways</h5>
+        {% for usr in users %}
+        <div class="w3-cell-row w3-striped w3-bordered w3-border accordion w3-white">
+          <div class="w3-container w3-third w3-cell">
+            <p>{{ usr['NickName'] }}</p>
+          </div>
+        
+          <div class="w3-container w3-third w3-cell">
+            <p>{{ usr['UserID'] }}</p>
+          </div>
+
+          <div class="w3-container w3-third w3-cell">
+            <p>{{ usr['UUID'] }}</p>
+          </div>
+        </div>
+        {% end %}
+        <form class="w3-container" method='POST' >
+            <br>Authorize new user:</br>
+            <div class="w3-section">
+            <div class="w3-third">
+                <input class="w3-input w3-border w3-margin-bottom" type="text" placeholder="Enter user id" name="UserID" required>
+               
+                <select id="GatewayID" name="GatewayID" required>
+                    {% for Gateway in Gateways %}
+                    <option value="{{Gateway['GatewayID']}}">{{ Gateway['UUID'] }}</option>
+                    {% end %}
+                </select>
+            </div>
+              {% raw xsrf_form_html() %}
+              <div class="w3-third">
+                <button class="w3-button w3-block w3-border w3-green" type="submit">Register</button>
+              </div>
+              
+            </div>
+          </form>
+    </div>
+</div>
+
+  {% include "Footer.html" %}

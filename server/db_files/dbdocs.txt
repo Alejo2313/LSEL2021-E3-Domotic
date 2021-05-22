@@ -1,0 +1,48 @@
+# Modify this code to update the DB schema diagram.
+# To reset the sample schema, replace everything with
+# two dots ('..' - without quotes).
+
+#https://app.quickdatabasediagrams.com/#/
+
+Users
+-
+UserID PK int FK >- UserGateways.UserID
+NickName string
+Password varchar(64)
+IsAdmin bool
+
+
+Gateways
+-
+GatewayID PK int
+AdminID FK >- Users.UserID int
+GatewayKey varchar(32)
+IsValid bool 
+
+UserGateways
+-
+UserID FK int
+GatewayID FK >- Gateways.GatewayID int
+
+
+Devices
+-
+DevicesID PK int FK >- DeviceOrder.DeviceID
+GatewayID FK >- Gateways.GatewayID int
+Type int
+DataType int
+
+SensorData
+-
+DevicesID FK >- Devices.DevicesID int
+TimeStamp date
+Data string
+
+DeviceOrder
+-
+DeviceID FK int
+TimeStamp date
+Data string 
+
+
+

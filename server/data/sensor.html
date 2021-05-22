@@ -1,0 +1,127 @@
+{% include "Header.html" %}
+{% autoescape None %}
+<style>
+    .accordion {
+      background-color: #eee;
+      color: #444;
+      cursor: pointer;
+      width: 100%;
+      border: none;
+      text-align: left;
+      outline: none;
+      transition: 0.4s;
+    }
+    
+    .active, .accordion:hover {
+      background-color: #ccc; 
+    }
+    
+    .panel {
+      padding: 0 18px;
+      display: none;
+      background-color: white;
+      overflow: hidden;
+    }
+    </style>
+
+<div class="w3-main" style="margin-left:300px;margin-top:43px;">
+    <div class="w3-container">
+        <div class="w3-cell-row w3-striped w3-bordered w3-border accordion w3-white w3-green">
+            <div class="w3-container w3-third w3-cell">
+              <p>DeviceID</p>
+            </div>
+          
+            <div class="w3-container w3-third w3-cell">
+              <p>SensorID</p>
+            </div>
+  
+            <div class="w3-container w3-third w3-cell">
+              <p>Type</p>
+            </div>
+        </div>
+
+
+        {% for sensor in sensors %}
+        <div class="w3-cell-row w3-striped w3-bordered w3-border accordion w3-white">
+            <div class="w3-container w3-third w3-cell">
+              <p>{{ sensor['DeviceID'] }}</p>
+            </div>
+          
+            <div class="w3-container w3-third w3-cell">
+              <p>{{ sensor['SensorID'] }}</p>
+            </div>
+  
+            <div class="w3-container w3-third w3-cell">
+              <p>{{ sensor['Type'] }}</p>
+            </div>
+        </div>
+
+        <div class="panel">
+            {% if sensor['Type'] == 3 or sensor['Type'] == 4 or  sensor['Type'] == 5 %}
+
+
+            <div id="graph-{{sensor['SensorID']}}" style="width:600px;height:250px;"></div>
+
+            <script>
+                TESTER = document.getElementById("graph-{{sensor['SensorID']}}");
+                Plotly.newPlot( TESTER, [{
+                x: {{sensor['data']["x"]}},
+                y: {{sensor['data']["y"]}} }], {
+                margin: { t: 0 } } );
+            </script>
+            {% end %}
+            
+            {% if sensor['Type'] == 2 %}
+
+            <form action="/sensor" method="POST">
+                <label for="favcolor">Select your favorite color:</label>
+                {% raw xsrf_form_html() %}
+                <input type="hidden" name="id" value="{{ sensor['DeviceID'] }}">
+                <input type="hidden" name="sensorID" value = "{{sensor['SensorID']}}">
+                <input type="color" id="" name="data" value="#ff0000"><br><br>
+                <input type="submit">
+            </form>
+            {% end %}
+
+            {% if sensor['Type'] == 0 %}
+            
+            <form action="/sensor" method="POST">
+              {% raw xsrf_form_html() %}
+              <input type="hidden" name="id" value="{{ sensor['DeviceID'] }}">
+              <input type="hidden" name="sensorID" value = "{{sensor['SensorID']}}">
+              <input type="radio" name="data" value="1">
+              <label for="male">ON</label><br>
+              <input type="radio" name="data" value="0">
+              <label for="male">OFF</label><br>
+              <input type="submit">
+            </form>
+            {% end %}
+
+        </div>
+        
+        {% end %}
+
+
+
+    </div>
+  
+</div>
+
+<script>
+    var acc = document.getElementsByClassName("accordion");
+    var i;
+    
+    for (i = 0; i < acc.length; i++) {
+      acc[i].addEventListener("click", function() {
+        this.classList.toggle("active");
+        var panel = this.nextElementSibling;
+        if (panel.style.display === "block") {
+          panel.style.display = "none";
+        } else {
+          panel.style.display = "block";
+        }
+      });
+    }
+</script>
+
+{% include "Footer.html" %}
