@@ -11,7 +11,7 @@ The */test* folder contains the *test_fsm_functions.c* file and its correspondin
 
 A PCB has been designed using Altium Designer to integrate all the components of the end node on a single board: the BME280 which is a temperature and humidity sensor, some LED strip lights and the ESP32-WROOM-32, which is the microcontroller that stablishes the connection with the gateway. The complete design can be found under the */pcb_altium* folder.
 
-![alt text](PCB.png "PCB")
+![alt text](pcb.PNG "PCB")
 
 
 ## Gateway
