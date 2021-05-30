@@ -88,7 +88,7 @@ class LogoutHandler(BaseHandler):
 
 class SensorHandler(BaseHandler):
     def get(self):
-        names = ["BUTTOM", "ALARM ","RGB LED","TEMPERATURE", "HUMIDITY", "PRESURE" ]
+        names = ["BUTTON", "ALARM ","RGB LED","TEMPERATURE", "HUMIDITY", "PRESSURE" ]
         devId = self.get_argument("id")
 
         if devId is None:
