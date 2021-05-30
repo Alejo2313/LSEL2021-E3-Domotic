@@ -13,7 +13,6 @@ from datetime import datetime
 
 from SQLHandler import QueryHandler
 
-
 class BaseHandler(tornado.web.RequestHandler):
 
     def get_current_user(self):
@@ -36,9 +35,7 @@ class BaseHandler(tornado.web.RequestHandler):
         session = self.get_secure_cookie("session")
         if(session is None):
             self.set_secure_cookie("session", str(time.time()))
-            
-
-        
+                  
 class LoginHandler(BaseHandler):
 
     def get(self):
@@ -72,7 +69,6 @@ class RegisterHandler(BaseHandler):
 
         db.add_user(user, password, 0)
         self.redirect("/")
-
 
 class IndexHandler(BaseHandler):
 
@@ -163,7 +159,6 @@ class PostDataHandler(BaseHandler):
                     db.push_data(GatewayUUID = data["Gateway"], DeviceUUID = dev["Device"], typeS=sen["Type"], Data = sen["data"])
         else:
             print("Gateway no found!")
-
 
 class UserGatewayHandler(BaseHandler):
 
@@ -261,16 +256,9 @@ def make_app():
             }),        
             ], **settings)
 
-
 if __name__ == "__main__":
 
-    
     db = QueryHandler("server", "server12345678","domotic")
-    
-    test =  db.get_gw_devices(7)
-    
-    print(test)
     application = make_app()
     application.listen(80)
-    print('sample_app server started')
     tornado.ioloop.IOLoop.instance().start()

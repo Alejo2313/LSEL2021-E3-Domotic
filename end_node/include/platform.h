@@ -49,6 +49,7 @@
 #include "esp_log.h"
 #include "driver/i2c.h"
 #include "driver/gpio.h"
+#include "driver/spi_master.h"
 #include "bme280.h"
 #include "bme280_defs.h"
 
@@ -83,7 +84,12 @@
 #define LEDB_GPIO       4
 #define LEDB_CHANNEL    LEDC_CHANNEL_2
 
+#define LED_HOST    HSPI_HOST
 
+#define PIN_NUM_MISO    12
+#define PIN_NUM_MOSI    13
+#define PIN_NUM_CLK     14
+#define PIN_NUM_CS      15
 //I2C definitions 
 
 #define BME_ADDR        BME280_I2C_ADDR_PRIM
@@ -109,6 +115,9 @@
 
 /******************************** Prototypes *******************************/
 
+void configSPI();
+
+void setColors(uint8_t red, uint8_t green, uint8_t blue);
 /**
  * @brief Configure PWM Hardware
  * 

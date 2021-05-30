@@ -105,8 +105,77 @@ struct bme280_dev bme280 =
 
 /******************************** Functions ********************************/
 
- 
+void lcd_spi_pre_transfer_callback(spi_transaction_t *t)
+{
+    return;
+}
+spi_device_handle_t spi;
 
+void configSPI()
+{
+     esp_err_t ret;
+    
+    spi_bus_config_t buscfg={
+        .miso_io_num=PIN_NUM_MISO,
+        .mosi_io_num=PIN_NUM_MOSI,
+        .sclk_io_num=PIN_NUM_CLK,
+        .quadwp_io_num=-1,
+        .quadhd_io_num=-1,
+    };
+    spi_device_interface_config_t dev_config={
+		 .address_bits = 0,
+		 .command_bits = 0,
+		 .dummy_bits = 0,
+		 .mode = 0,
+		 .duty_cycle_pos = 0,
+		 .cs_ena_posttrans = 0,
+		 .cs_ena_pretrans = 0,
+		 .clock_speed_hz = 10000,
+		 .spics_io_num = PIN_NUM_CS,
+		 .flags = 0,
+		 .queue_size = 1,
+		 .pre_cb = NULL,
+		 .post_cb = NULL
+    };
+    //Initialize the SPI bus
+    ret=spi_bus_initialize(LED_HOST, &buscfg, 0);
+    ESP_ERROR_CHECK(ret);
+    //Attach the LCD to the SPI bus
+    ret=spi_bus_add_device(LED_HOST, &dev_config, &spi);
+    ESP_ERROR_CHECK(ret);
+}
+
+void setColors(uint8_t red, uint8_t green, uint8_t blue)
+{
+
+    //   11
+    uint8_t data[12] ;
+    uint8_t temp[4];
+    memset(data, 0, 12);
+
+    temp[0] = 0xC0 | (((~blue)&0xC0)>>6) |  (((~green)&0xC0)>>4) | (((~red)&0xC0)>>2);
+
+
+    temp[1] = blue;
+    temp[2] = green;
+    temp[3] = red;
+
+    memcpy(data+4, temp, 4);
+
+    spi_transaction_t t;
+    memset(&t, 0, sizeof(t));       //Zero out the transaction
+    t.length= 12*8;                    //Len is in bytes, transaction length is in bits.
+    
+
+    t.tx_buffer= data;             //Data
+    t.rx_buffer = NULL;
+    
+    t.user=(void*)0;                //D/C needs to be set to 1
+    spi_device_transmit(spi, &t);  //Transmit!
+    
+   // assert(ret==ESP_OK);            //Should have had no issue
+    ESP_LOGI("spi", "ESTATUS %x", data[0]);
+}
 
 /**
  * @brief Configure PWM Hardware

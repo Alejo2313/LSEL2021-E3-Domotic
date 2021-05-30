@@ -49,6 +49,7 @@ typedef struct
     void (*setGPIO)(uint32_t GPIO);                     //<! Set GPIO to HIGH
     void (*resetGPIO)(uint32_t GPIO);                   //<! Set GPIO to  LOW
     void (*pwmSet)(uint32_t GPIO, uint8_t dutyCycle);   //<! Set PWM duty Cycle 
+    void (*setColors)(uint8_t red, uint8_t green, uint8_t blue);
 
 }led_interface_t;
 

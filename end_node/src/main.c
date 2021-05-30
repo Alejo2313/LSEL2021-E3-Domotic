@@ -80,15 +80,16 @@ fsm_led_t fsm_led =
         .gPin     = LEDG_GPIO,
         .bPin     = LEDB_GPIO,
 
-        .rColor   = 0,
-        .gColor   = 0,
-        .bColor   = 0,
+        .rColor   = 0xFF,
+        .gColor   = 0xFF,
+        .bColor   = 0xFF,
     },
     .interface = 
     {
         .pwmSet     = setPWM,
         .resetGPIO  = resetGPIO,
         .setGPIO    = setGPIO,
+        .setColors  = setColors,
     }
     
 };
@@ -157,6 +158,7 @@ void app_main(void)
 
 
     //Init system
+    
     ESP_ERROR_CHECK(nvs_flash_init());
     ESP_ERROR_CHECK(esp_event_loop_create_default());
     esp_netif_init();
@@ -167,6 +169,8 @@ void app_main(void)
     load_data();
     sensorInit();
     configPWM();
+    
+    configSPI();
 
     //init FSM
     fsm_init((fsm_t*)(&fsm_event), eventos_fsm);

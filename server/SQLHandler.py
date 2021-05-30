@@ -2,8 +2,6 @@
 import mysql.connector
 from datetime import datetime
 
-
-
 class QueryHandler:
 
     def __init__ (self, user, password, database, host = '127.0.0.1'):

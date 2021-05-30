@@ -121,9 +121,18 @@ void turnOnLed ( fsm_t* this )
 
   CLEAR_FLAGS(fsm->data.flags, LED_ON);
 
-  fsm->interface.pwmSet(fsm->data.rPin, DEFAULT_DUTY);
-  fsm->interface.pwmSet(fsm->data.gPin, DEFAULT_DUTY);
-  fsm->interface.pwmSet(fsm->data.bPin, DEFAULT_DUTY);
+
+  if(fsm->interface.setColors != NULL)
+  {
+    fsm->interface.setColors(fsm->data.rColor,fsm->data.gColor,fsm->data.bColor);
+  }
+  else
+  {
+    fsm->interface.pwmSet(fsm->data.rPin, DEFAULT_DUTY);
+    fsm->interface.pwmSet(fsm->data.gPin, DEFAULT_DUTY);
+    fsm->interface.pwmSet(fsm->data.bPin, DEFAULT_DUTY);
+  }
+
   
 }
 
@@ -139,10 +148,16 @@ void changeColor ( fsm_t* this )
 
   CLEAR_FLAGS(fsm->data.flags, LED_COLOR);
 
-  fsm->interface.pwmSet(fsm->data.rPin, fsm->data.rColor);
-  fsm->interface.pwmSet(fsm->data.gPin, fsm->data.gColor);
-  fsm->interface.pwmSet(fsm->data.bPin, fsm->data.bColor);
-
+  if(fsm->interface.setColors != NULL)
+  {
+    fsm->interface.setColors(fsm->data.rColor,fsm->data.gColor,fsm->data.bColor);
+  }
+  else
+  {
+    fsm->interface.pwmSet(fsm->data.rPin, fsm->data.rColor);
+    fsm->interface.pwmSet(fsm->data.gPin, fsm->data.gColor);
+    fsm->interface.pwmSet(fsm->data.bPin, fsm->data.bColor);
+  }
 }
 
 /**
@@ -157,9 +172,16 @@ void turnOffLed ( fsm_t* this )
 
   CLEAR_FLAGS(fsm->data.flags, LED_OFF | LED_COLOR | LED_ON);
 
-  fsm->interface.pwmSet(fsm->data.rPin, 0);
-  fsm->interface.pwmSet(fsm->data.gPin, 0);
-  fsm->interface.pwmSet(fsm->data.bPin, 0);
+  if(fsm->interface.setColors != NULL)
+  {
+    fsm->interface.setColors(0,0,0);
+  }
+  else
+  {
+    fsm->interface.pwmSet(fsm->data.rPin, 0);
+    fsm->interface.pwmSet(fsm->data.gPin, 0);
+    fsm->interface.pwmSet(fsm->data.bPin, 0);
+  }
 }
 
 
