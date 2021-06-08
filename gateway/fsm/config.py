@@ -3,7 +3,12 @@ import json
 
 
 class config_read (object):
-    
+    """Class for managing the read of configuration parameters from a .ini config
+    file
+
+    Args:
+        object (object): generic object
+    """    
     def __init__(self, path, f_name, server_ip = None, broker_ip = None,
         header_json = None, root_topic = None):
         if (path == "" or f_name == ""):
@@ -15,6 +20,7 @@ class config_read (object):
             self.broker_ip = ""
             self.header_json = ""
             self.root_topic = ""
+            self.gateway_user = ""
     
 
     def get_path(self):
@@ -35,8 +41,35 @@ class config_read (object):
     def get_root_topic(self):
         return self.root_topic
 
+    def get_gateway_user(self):
+        return self.gateway_user
+
     def exist(self, path, file):
+        """Checks if the configuration file already exists. If not, creates
+        one under ./config folder with default values.
+
+        Args:
+            path (str): path where search the file
+            file (str): file name
+        """
+
+
         def create_config(path, file):
+            """Creates the config file in the specified path with config server params,
+            config mqtt and config gateway parameters to defaul values presented below:
+            #config server
+            server.ip = localhost
+            header_json = "Content-type": "application/json", "Accept" : "text/plain"
+            #config mqtt
+            broker.ip = localhost
+            root_topic = /HOME
+            #config gateway
+            gateway.allowed_name = POC
+
+            Args:
+                path (str): path to create config file
+                file (str): file name 
+            """            
             if (os.path.isdir("./" + path) == False):
                 os.mkdir("./" + path)       
             header_json_aux = {"Content-type": "application/json", "Accept" : "text/plain"}
@@ -47,8 +80,10 @@ class config_read (object):
             config_file.write("header_json = " + json.dumps(header_json_aux))
             config_file.write("\n")
             config_file.write("#config mqtt\n")
-            config_file.write("broker.ip = localhost\n")
-            config_file.write("root_topic = /home\n")
+            config_file.write("broker.ip = 51.103.29.76\n")
+            config_file.write("root_topic = /HOME\n")
+            config_file.write("#config gateway\n")
+            config_file.write(" gateway.allowed_name = POC\n")
             config_file.close()
 
 
@@ -81,8 +116,27 @@ class config_read (object):
                 return True
 
     def read_config(self, path, file):
-        
+        """Reads configuration params from config file
+
+        Args:
+            path (str): path of config file
+            file (str): file to be read
+        """
+
         def parse_server_params(file_list, pos):
+            """get server params from config file
+
+            Args:
+                file_list (list): list with config file content
+                pos (int): positions where is pretended to be server params
+
+            Raises:
+                ValueError: empty params
+                ValueError: different params
+
+            Returns:
+                list: list with server params
+            """            
             res = ["", ""]
             for j in range(pos + 1, pos + 3):
                 aux = file_list[j].replace(" ", "")
@@ -98,6 +152,19 @@ class config_read (object):
             return res
 
         def parse_mqtt_params(file_list, pos):
+            """gets mqtt params from config file
+
+            Args:
+                file_list (list): list with config file content
+                pos (int): positions where is pretended to be server params
+
+            Raises:
+                ValueError: empty params
+                ValueError: different params
+
+            Returns:
+                list: list with mqtt params
+            """            
             res = ["", ""]
             for j in range(pos + 1, pos + 3):
                 aux = file_list[j].replace(" ", "")
@@ -111,7 +178,32 @@ class config_read (object):
                 else:
                     raise ValueError("Param not valid")
             return res
-                
+        
+        def parse_gateway_params(file_list,pos):
+            """gets gateway param from config file
+
+            Args:
+                file_list (list): list with config file content
+                pos (int): positions where is pretended to be gateway params
+
+            Raises:
+                ValueError: empty params
+                ValueError: different params
+
+            Returns:
+                list: list with gateway param
+            """               
+            res = [""]
+            for j in range(pos + 1, pos + 2):
+                aux = file_list[j].replace(" ", "")
+                aux = aux.split("=")
+            if (aux[0] == "" or aux[1] == ""):
+                raise ValueError("Param or value must be non empty")                    
+            elif (aux[0] == "gateway.allowed_user"):
+                res[0] = aux[1]
+            else:
+                raise ValueError("Param not valid")
+            return res
 
         if (path == "" or file == ""):
             raise ValueError("The name of the file or path must be non empty")
@@ -125,16 +217,10 @@ class config_read (object):
                         server_params = parse_server_params(config_list, config_list.index(i))
                         self.server_ip = server_params[0].replace("\n","")
                         self.header_json = server_params[1].replace("\n","")
-#                        print("server IP: " + (self.get_server_ip()))
-#                        print("header json: " + self.get_header_json())
                     elif (i == "#config mqtt\n"):
                         mqtt_params = parse_mqtt_params(config_list, config_list.index(i))
                         self.broker_ip = mqtt_params[0].replace("\n","")
                         self.root_topic = mqtt_params[1].replace("\n","")
-#                        print("Broker IP: " + self.get_broker_ip())
-#                        print("Root topic: " + self.get_root_topic())
-
-prueba = config_read("config" , "config.ini")
-prueba.read_config(prueba.get_path(), prueba.get_f_name())
-                        
-
+                    elif (i == "#config gateway\n"):
+                        gw_params = parse_gateway_params(config_list,config_list.index(i))
+                        self.gateway_user = gw_params[0].replace("\n","")

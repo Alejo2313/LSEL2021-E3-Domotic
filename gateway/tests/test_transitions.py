@@ -1,4 +1,13 @@
+import os
+import sys
+import inspect
 import unittest
+
+# For selecting the correct path
+currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+parentdir = os.path.dirname(currentdir) + "/fsm" 
+sys.path.insert(0, parentdir)
+
 from control_flow import Control_flow
 
 class Test_control_flow_transitions(unittest.TestCase):

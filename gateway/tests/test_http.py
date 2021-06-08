@@ -1,6 +1,17 @@
+
+import os
+import sys
+import inspect
 import unittest
-from http_client import http_client
 import json
+
+# For selecting the correct path
+currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+parentdir = os.path.dirname(currentdir) + "/fsm" 
+sys.path.insert(0, parentdir)
+
+from http_client import http_client
+
 
 class Test_control_flow_http(unittest.TestCase):
     @classmethod
